@@ -2,4 +2,21 @@
 if [ -z "$DART_SOURCES" ]; then
 	DART_SOURCES="$HOME/dart"
 fi
-g++ -O2 -DDART_SHARED_LIB -I$DART_SOURCES/runtime/include src/dart_sqlite.cc -lsqlite3 -shared -rdynamic -fPIC -o lib/libdart_sqlite.so -m32
+SRCS="src/dart_sqlite.cc"
+COPTS="-O2 -DDART_SHARED_LIB -I$DART_SOURCES/runtime/include -lsqlite3 -rdynamic -fPIC -m32"
+OUTNAME="dart_sqlite"
+
+UNAME=`uname`
+if [[ "$UNAME" == "Darwin" ]]; then
+  COPTS="$COPTS -dynamiclib -undefined suppress -flat_namespace"
+  OUTNAME="$OUTNAME.dylib"
+else
+  if [[ "$UNAME" != "Linux" ]]; then
+    echo "Warning: Unrecognized OS $UNAME, this likely won't work"
+  fi
+  COPTS="$COPTS -shared"
+  OUTNAME="lib$OUTNAME.so"
+fi
+
+echo g++ $COPTS $SRCS -o lib/$OUTNAME
+g++ $COPTS $SRCS -o lib/$OUTNAME
