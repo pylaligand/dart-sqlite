@@ -4,7 +4,8 @@ dart-sqlite: SQLite bindings for the Dart VM
 # Prerequisites
   * Dart source tree (strictly, you just need runtime/include/dart_api.h)
   * sqlite3-dev package
-  * Linux or Mac, g++ toolchain. (I'm looking at Windows...)
+  * Linux or Mac, g++ toolchain. (Windows is too hard, for now...)
+  * Dart SDK, if you want to generate documentation
 
 # Building
     DART_SOURCES=~/pathto/dart ./build.sh
