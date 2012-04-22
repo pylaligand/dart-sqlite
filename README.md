@@ -13,6 +13,9 @@ environment variables DART_SOURCES and DART_SDK.
 # Building
     ./build.sh
 
+Alternatively you can try a [binary build](https://github.com/downloads/sam-mccall/dart-sqlite/v0.1.zip)
+which might work on Mac and 64-bit Linux, and probably won't anywhere else.
+
 # Usage
     #import('lib/sqlite.dart');
     var c = new sqlite.Connection("/tmp/test.db");
