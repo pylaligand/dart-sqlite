@@ -7,7 +7,8 @@
 #import("dart-ext:dart_sqlite");
 
 /// A connection to a SQLite database. 
-/// Each database must be [close()]d after use.
+///
+/// Each database must be [close]d after use.
 class Database {
   var _db;
   /// The location on disk of the database file.
@@ -27,6 +28,7 @@ class Database {
   String toString() => "<Sqlite: ${path}>";
 
   /// Closes the database.
+  ///
   /// This should be called exactly once for each instance created.
   /// After calling this method, all attempts to operate on the database
   /// will throw [SqliteException].
@@ -37,6 +39,7 @@ class Database {
   }
 
   /// Executes [callback] in a transaction, and returns the callback's return value.
+  ///
   /// If the callbacks throws an exception, the transaction will be rolled back
   /// and the exception propagated, otherwise the transaction will be committed.
   transaction(callback()) {
@@ -53,8 +56,10 @@ class Database {
   }
 
   /// Creates a new reusable prepared statement.
+  ///
   /// [sql] may contain '?' as a placeholder for values. These values can be
   /// specified when the statement is executed.
+  ///
   /// Each prepared statement should be closed after use.
   Statement prepare(String sql) {
     _checkOpen();
@@ -62,7 +67,7 @@ class Database {
   }
 
   /// Executes a single SQL statement.
-  /// See [Statement#execute].
+  /// See [Statement.execute].
   int execute(String statement, [params=const [], bool callback(Row)]) {
     _checkOpen();
     statement = prepare(statement);
@@ -74,6 +79,7 @@ class Database {
   }
 
   /// Executes a single SQL statement, and returns the first row.
+  ///
   /// Any additional results will be discarded. If there are no results, returns null.
   Row first(String statement, [params = const []]) {
     _checkOpen();
@@ -91,8 +97,10 @@ class Database {
 }
 
 /// A reusable prepared SQL statement.
+///
 /// The statement may contain placeholders for values, these values are specified
-/// with each call to [execute()].
+/// with each call to [execute].
+///
 /// Each prepared statement should be closed after use.
 class Statement {
   var _statement;
@@ -108,6 +116,7 @@ class Statement {
   }
 
   /// Closes this statement, and releases associated resources.
+  ///
   /// This should be called exactly once for each instance created.
   /// After calling this method, attempting to execute the statement will throw [SqliteException]. 
   void close() {
@@ -117,9 +126,11 @@ class Statement {
   }
 
   /// Executes this statement.
+  ///
   /// If this statement contains placeholders, their values must be specified in [params].
   /// If [callback] is given, it will be invoked for each [Row] that this statement produces.
   /// [callback] may return [:true:] to stop fetching rows.
+  ///
   /// Returns the number of rows fetched (for statements which produce rows), 
   /// or the number of rows affected (for statements which alter data).
   int execute([params = const [], bool callback(Row)]) {
@@ -167,10 +178,13 @@ class _ResultInfo {
 }
 
 /// A row of data returned from a executing a [Statement].
+///
 /// Entries can be accessed in several ways:
-///   * row[0]       // by column number
-///   * row.title    // by name
-///   * row['title'] // by name
+///
+///   * By index: `row[0]`
+///   * By name: `row['title']`
+///   * By name: `row.title`
+///
 /// Column names are not guaranteed unless a SQL AS clause is used.
 class Row {
   final List<String> _resultInfo;
