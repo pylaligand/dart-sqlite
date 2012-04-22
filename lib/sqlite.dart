@@ -86,7 +86,7 @@ class Database {
   }
 
   _checkOpen() {
-    if (_db == null) throw new SqliteException("Database is closed");
+    if (_db == null) throw new SqliteException._internal("Database is closed");
   }
 }
 
@@ -104,7 +104,7 @@ class Statement {
   }
 
   _checkOpen() {
-    if (_statement == null) throw new SqliteException("Statement is closed");
+    if (_statement == null) throw new SqliteException._internal("Statement is closed");
   }
 
   /// Closes this statement, and releases associated resources.
@@ -131,7 +131,7 @@ class Statement {
     var info = null;
     while ((result = _step(_statement)) is! int) {
       count++;
-      if (info == null) info = _column_info(_statement);
+      if (info == null) info = new _ResultInfo(_column_info(_statement));
       if (callback != null && callback(new Row._internal(count - 1, info, result))) break;
     }
     // If update affected no rows, count == result == 0
@@ -158,7 +158,7 @@ class _ResultInfo {
   List columns;
   Map columnToIndex;
 
-  ResultInfo(columns) {
+  _ResultInfo(this.columns) {
     columnToIndex = {};
     for (int i = 0; i < columns.length; i++) {
       columnToIndex[columns[i]] = i;
@@ -188,7 +188,7 @@ class Row {
       return _data[i];
     } else {
       index = _resultInfo.columnToIndex[i];
-      if (index == null) throw new SqliteException("No such column $i");
+      if (index == null) throw new SqliteException._internal("No such column $i");
       return _data[index];
     }
   }

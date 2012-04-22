@@ -2,8 +2,8 @@
 if [ -z "$DART_SOURCES" ]; then
 	DART_SOURCES="$HOME/dart"
 fi
-SRCS="src/dart_sqlite.cc"
-COPTS="-O2 -DDART_SHARED_LIB -I$DART_SOURCES/runtime/include -lsqlite3 -rdynamic -fPIC -m32"
+SRCS="src/dart_sqlite.cc -lsqlite3"
+COPTS="-O2 -DDART_SHARED_LIB -I$DART_SOURCES/runtime/include -rdynamic -fPIC -m32"
 OUTNAME="dart_sqlite"
 
 UNAME=`uname`

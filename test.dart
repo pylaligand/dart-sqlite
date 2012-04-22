@@ -1,7 +1,7 @@
 #import("lib/sqlite.dart", prefix:"sqlite");
 
 main() {
-  var c = new sqlite.Connection("/tmp/test.db");
+  var c = new sqlite.Database("/tmp/test.db");
   try {
     print(c.first("SELECT ?+2, UPPER(?)", [3, "Hello"]).asMap());
     
