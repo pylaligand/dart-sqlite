@@ -37,10 +37,11 @@ dart-sqlite: SQLite bindings for the Dart VM
     }
 
 # Documentation
-[Yes!](http://sam-mccall.github.com/dart-sqlite/)
+Yes! [Here's the dartdoc](http://sam-mccall.github.com/dart-sqlite/).
 
 To generate a local copy:
-    DART_SDK=~/pathto/dart-sdk ./build.sh doc
+
+     DART_SDK=~/pathto/dart-sdk ./build.sh doc
 
 # Legal stuff
 Copyright 2012 Google Inc.
