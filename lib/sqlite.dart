@@ -201,7 +201,7 @@ class Row {
     if (i is int) {
       return _data[i];
     } else {
-      index = _resultInfo.columnToIndex[i];
+      var index = _resultInfo.columnToIndex[i];
       if (index == null) throw new SqliteException._internal("No such column $i");
       return _data[index];
     }
@@ -225,7 +225,7 @@ class Row {
   noSuchMethod(String method, List args) {
     if (args.length == 0 && method.startsWith("get:")) {
       String property = method.substring(4);
-      index = _resultInfo.columnToIndex[i];
+      var index = _resultInfo.columnToIndex[property];
       if (index != null) return _data[index];
     }
     return super.noSuchMethod(method, args);
