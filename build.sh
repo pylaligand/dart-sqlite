@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 if [ -z "$DART_SOURCES" ]; then
 	DART_SOURCES="$HOME/dart"
 fi
