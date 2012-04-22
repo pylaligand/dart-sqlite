@@ -70,6 +70,7 @@ main() {
     connectionOnDisk(test);
     connectionInMemory(test);
   });
+  print("All tests pass!");
 }
 
 createBlogTable(db) {
