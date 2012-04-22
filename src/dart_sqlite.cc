@@ -1,6 +1,7 @@
-// Copyright (c) 2012, the Dart project authors.  Please see the AUTHORS file
-// for details. All rights reserved. Use of this source code is governed by a
-// BSD-style license that can be found in the LICENSE file.
+// Copyright 2012 Google Inc.
+// Licensed under the Apache License, Version 2.0 (the "License")
+// You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
+
 #include <string.h>
 #include <stdio.h>
 
