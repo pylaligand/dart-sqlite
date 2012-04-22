@@ -3,7 +3,6 @@
 #DART_SOURCES=$HOME/dart
 #DART_SDK=$HOME/dart-sdk
 
-
 if [ -z "$DART_SDK" ]; then
   DART_SDK="$HOME/dart-sdk"
 fi
@@ -40,7 +39,7 @@ doc() {
 }
 
 test() {
-  build
+  build && \
   $DART_SDK/bin/dart test/test.dart
 }
 

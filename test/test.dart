@@ -1,18 +1,79 @@
 #import('dart:io', prefix: 'io');
 #import('../lib/sqlite.dart', prefix: 'sqlite');
 
-testFirst(connection) {
-  var row = connection.first("SELECT 2+2 AS foo");
-  Expect.equals(4, row[0]);
-  Expect.equals(4, row["foo"]);
-  Expect.equals(4, row.foo);
+testFirst(db) {
+  var row = db.first("SELECT ?+2, UPPER(?)", [3, "hello"]);
+  Expect.equals(5, row[0]);
+  Expect.equals("HELLO", row[1]);
+}
+
+testRow(db) {
+  var row = db.first("SELECT 42 AS foo");
+  Expect.equals(0, row.index);
+
+  Expect.equals(42, row[0]);
+  Expect.equals(42, row['foo']);
+  Expect.equals(42, row.foo);
+
+  Expect.listEquals([42], row.asList());
+  Expect.mapEquals({"foo": 42}, row.asMap());
+}
+
+testBulk(db) {
+  createBlogTable(db);
+  var insert = db.prepare("INSERT INTO posts (title, body) VALUES (?,?)");
+  try {
+    Expect.equals(1, insert.execute(["hi", "hello world"]));
+    Expect.equals(1, insert.execute(["bye", "goodbye cruel world"]));
+  } finally {
+    insert.close();
+  }
+  var rows = [];
+  Expect.equals(2, db.execute("SELECT * FROM posts", callback: (row) { rows.add(row); }));
+  Expect.equals(2, rows.length);
+  Expect.equals("hi", rows[0].title);
+  Expect.equals("bye", rows[1].title);
+  Expect.equals(0, rows[0].index);
+  Expect.equals(1, rows[1].index);
+  rows = [];
+  Expect.equals(1, db.execute("SELECT * FROM posts", callback: (row) {
+    rows.add(row);
+    return true;
+  }));
+  Expect.equals(1, rows.length);
+  Expect.equals("hi", rows[0].title);  
+}
+
+testTransactionSuccess(db) {
+  createBlogTable(db);
+  Expect.equals(42, db.transaction(() {
+    db.execute("INSERT INTO posts (title, body) VALUES (?,?)");
+    return 42;
+  }));
+  Expect.equals(1, db.execute("SELECT * FROM posts"));
+}
+
+testTransactionFailure(db) {
+  createBlogTable(db);
+  try {
+    db.transaction(() {
+      db.execute("INSERT INTO posts (title, body) VALUES (?,?)");
+      throw new UnsupportedOperationException("whee");
+    });
+    fail("Exception should have been propagated");
+  } catch (UnsupportedOperationException expected) {}
+  Expect.equals(0, db.execute("SELECT * FROM posts"));
 }
 
 main() {
-  [testFirst].forEach((test) {
+  [testFirst, testRow, testBulk].forEach((test) {
     connectionOnDisk(test);
     connectionInMemory(test);
   });
+}
+
+createBlogTable(db) {
+  db.execute("CREATE TABLE posts (title text, body text)");
 }
 
 deleteWhenDone(callback(filename)) {

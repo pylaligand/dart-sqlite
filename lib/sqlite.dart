@@ -143,10 +143,13 @@ class Statement {
     while ((result = _step(_statement)) is! int) {
       count++;
       if (info == null) info = new _ResultInfo(_column_info(_statement));
-      if (callback != null && callback(new Row._internal(count - 1, info, result))) break;
+      if (callback != null && callback(new Row._internal(count - 1, info, result)) == true) {
+        result = count;
+        break;
+      }
     }
     // If update affected no rows, count == result == 0
-    return (result == 0) ? count : result;
+    return (count == 0) ? result : count;
   }
 }
 
