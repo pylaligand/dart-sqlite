@@ -1,24 +1,16 @@
 dart-sqlite: SQLite bindings for the Dart VM
 ============================================
 
-# Prerequisites
-  * Dart source tree (strictly, you just need runtime/include/dart_api.h)
-  * Dart SDK, if you want to generate documentation
-  * sqlite3-dev package
-  * Linux or Mac, g++ toolchain. (Windows is too hard, for now...)
+# Download
 
-Either edit build.sh to point to the source tree and SDK, or set the
-environment variables DART_SOURCES and DART_SDK.
+Try the [binary build](https://github.com/downloads/sam-mccall/dart-sqlite/v0.2.zip)
+which should work on Mac, 64-bit Linux, and Windows.
 
-# Building
-    ./build.sh
+You can also build it yourself, see below.
 
-Alternatively you can try a [binary build](https://github.com/downloads/sam-mccall/dart-sqlite/v0.1.zip)
-which might work on Mac and 64-bit Linux, and probably won't anywhere else.
-
-# Usage
+# Example
     #import('lib/sqlite.dart');
-    var c = new sqlite.Connection("/tmp/test.db");
+    var c = new sqlite.Database("/tmp/test.db");
     try {
         // Simple queries and statements
         Row results = c.first("SELECT ?+2, UPPER(?)", [3, "Hello"]);
@@ -44,16 +36,58 @@ which might work on Mac and 64-bit Linux, and probably won't anywhere else.
     }
 
 # Documentation
+
 Yes! [Here's the dartdoc](http://sam-mccall.github.com/dart-sqlite/).
 
-To generate a local copy:
+# Building (Linux/Mac)
+
+You'll need:
+  * Dart source tree (strictly, you just need runtime/include/dart_api.h)
+  * Dart SDK
+  * sqlite3-dev package
+  * g++ toolchain.
+
+Either edit build.sh to point to the source tree and SDK, or set the
+environment variables DART_SOURCES and DART_SDK.
+
+## Building the library
+
+    ./build.sh
+
+## Generating documentation
 
     ./build.sh doc
 
-# Tests
-In test/test.dart. To run them:
+## Running tests
 
     ./build.sh test
+
+# Building (Windows)
+
+You'll need:
+
+  * Dart source tree (strictly, you just need runtime/include/dart_api.h)
+  * Dart SDK
+  * dart.lib, the Dart native API library. You can obtain this by compiling Dart from source or grab [this version](https://github.com/downloads/sam-mccall/dart-sqlite/dart.lib) (last updated: 2012-04-24)
+  * The [SQLite source code](http://www.sqlite.org/download.html) (the 'amalgamation')
+  * Visual C++ 2008. The [free version](http://msdn.microsoft.com/en-us/express/future/bb421473) works fine.
+
+Edit build.cmd to point to the Dart source tree and SDK and the SQLite sources.
+
+## Building the library 
+
+Edit build.bat to specify where you extracted the SQLite and Dart sources.
+
+    C:\Program Files (x86)\Microsoft Visual Studio 9.0\VC\vcvarsall.bat
+    build
+
+## Generating the documentation
+
+    build doc
+
+## Running tests
+
+    build test
 
 # Legal stuff
 Copyright 2012 Google Inc.
