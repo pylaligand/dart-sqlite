@@ -99,15 +99,13 @@ DART_FUNCTION(Version) {
 void finalize_statement(Dart_Handle handle, void* ctx) {
   static bool warned = false;
   statement_peer* statement = (statement_peer*) ctx;
-  if (statement->stmt) {
-    sqlite3_finalize(statement->stmt);
-    statement->stmt = NULL;
-    if (!warned) {
-      fprintf(stderr, "Warning: sqlite.Statement was not closed before garbage collection.\n");
-      warned = true;
-    }
+  sqlite3_finalize(statement->stmt);
+  if (!warned) {
+    fprintf(stderr, "Warning: sqlite.Statement was not closed before garbage collection.\n");
+    warned = true;
   }
   sqlite3_free(statement);
+  Dart_DeletePersistentHandle(statement->finalizer);
 }
 
 DART_FUNCTION(PrepareStatement) {
