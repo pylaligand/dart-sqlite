@@ -8,21 +8,15 @@
 #include "dart_api.h"
 #include "sqlite3.h"
 
-#define VA_NARGS_IMPL(_1,_2,_3,_4,_5,_6,_7,_8,N,...) N
-#define VA_NARGS(...) VA_NARGS_IMPL(__VA_ARGS__, 8, 7, 6, 5, 4, 3, 2, 1)
 #define DART_ARG(name, i) Dart_Handle name = Dart_GetNativeArgument(arguments, i);
-#define DART_ARGS_0() /*{printf("Entering %s\n", __FUNCTION__);}*/
+#define DART_ARGS_0() Dart_EnterScope(); /*{printf("Entering %s\n", __FUNCTION__);}*/
 #define DART_ARGS_1(arg0) DART_ARGS_0() DART_ARG(arg0, 0)
 #define DART_ARGS_2(arg0, arg1) DART_ARGS_1(arg0); DART_ARG(arg1, 1)
 #define DART_ARGS_3(arg0, arg1, arg2) DART_ARGS_2(arg0, arg1); DART_ARG(arg2, 2)
 #define DART_ARGS_4(arg0, arg1, arg2, arg3) DART_ARGS_3(arg0, arg1, arg2); DART_ARG(arg3, 3)
 
-#define DART_ARGS_IMPL1(count, ...) DART_ARGS_ ## count (__VA_ARGS__)
-#define DART_ARGS_IMPL0(count, ...) DART_ARGS_IMPL1(count, __VA_ARGS__)
-#define DART_ARGS(...) DART_ARGS_IMPL0(VA_NARGS(__VA_ARGS__), __VA_ARGS__)
-
 #define DART_FUNCTION(name) static void name(Dart_NativeArguments arguments)
-#define DART_RETURN(expr) {Dart_SetReturnValue(arguments, expr); return;}
+#define DART_RETURN(expr) {Dart_SetReturnValue(arguments, expr); Dart_ExitScope(); return;}
 
 Dart_NativeFunction ResolveName(Dart_Handle name, int argc);
 
@@ -71,7 +65,8 @@ statement_peer* get_statement(Dart_Handle statement_handle) {
 }
 
 DART_FUNCTION(New) {
-  DART_ARGS(path);
+  DART_ARGS_1(path);
+
   sqlite3* db;
   const char* cpath;
   CheckDartError(Dart_StringToCString(path, &cpath));
@@ -81,7 +76,8 @@ DART_FUNCTION(New) {
 }
 
 DART_FUNCTION(Close) {
-  DART_ARGS(db_handle);
+  DART_ARGS_1(db_handle);
+
   sqlite3* db = get_db(db_handle);
   sqlite3_stmt* statement = NULL;
   int count = 0;
@@ -95,18 +91,19 @@ DART_FUNCTION(Close) {
 }
 
 DART_FUNCTION(Version) {
+  DART_ARGS_0();
+
   DART_RETURN(Dart_NewString(sqlite3_version));
 }
 
 void finalize_statement(Dart_Handle handle, void* ctx) {
-  printf("finalize_statement\n");
   static bool warned = false;
   statement_peer* statement = (statement_peer*) ctx;
   if (statement->stmt) {
     sqlite3_finalize(statement->stmt);
     statement->stmt = NULL;
     if (!warned) {
-      fprintf(stderr, "Warning: Sqlite Statement was not closed.\n");
+      fprintf(stderr, "Warning: sqlite.Statement was not closed before garbage collection.\n");
       warned = true;
     }
   }
@@ -114,11 +111,12 @@ void finalize_statement(Dart_Handle handle, void* ctx) {
 }
 
 DART_FUNCTION(PrepareStatement) {
-  DART_ARGS(db_handle, sql_handle, statement_object);
+  DART_ARGS_3(db_handle, sql_handle, statement_object);
+
   sqlite3* db = get_db(db_handle);
   const char* sql;
-  CheckDartError(Dart_StringToCString(sql_handle, &sql));
   sqlite3_stmt* stmt;
+  CheckDartError(Dart_StringToCString(sql_handle, &sql));
   if (sqlite3_prepare_v2(db, sql, strlen(sql), &stmt, NULL)) {
     Dart_Handle params[2];
     params[0] = Dart_NewString(sqlite3_errmsg(db));
@@ -133,14 +131,17 @@ DART_FUNCTION(PrepareStatement) {
 }
 
 DART_FUNCTION(Reset) {
-  DART_ARGS(statement_handle);
+  DART_ARGS_1(statement_handle);
+
   statement_peer* statement = get_statement(statement_handle);
   CheckSqlError(statement->db, sqlite3_clear_bindings(statement->stmt));
   CheckSqlError(statement->db, sqlite3_reset(statement->stmt));
+  DART_RETURN(Dart_Null());
 }
 
 DART_FUNCTION(Bind) {
-  DART_ARGS(statement_handle, args);
+  DART_ARGS_2(statement_handle, args);
+
   statement_peer* statement = get_statement(statement_handle);
   if (!Dart_IsList(args)) {
     Throw("args must be a List");
@@ -178,6 +179,7 @@ DART_FUNCTION(Bind) {
       Throw("Invalid parameter type");
     }
   }
+  DART_RETURN(Dart_Null());
 }
 
 Dart_Handle get_column_value(statement_peer* statement, int col) {
@@ -218,7 +220,8 @@ Dart_Handle get_last_row(statement_peer* statement) {
 }
 
 DART_FUNCTION(ColumnInfo) {
-  DART_ARGS(statement_handle);
+  DART_ARGS_1(statement_handle);
+
   statement_peer* statement = get_statement(statement_handle);
   int count = sqlite3_column_count(statement->stmt);
   Dart_Handle result = Dart_NewList(count);
@@ -229,7 +232,8 @@ DART_FUNCTION(ColumnInfo) {
 }
  
 DART_FUNCTION(Step) {
-  DART_ARGS(statement_handle);
+  DART_ARGS_1(statement_handle);
+
   statement_peer* statement = get_statement(statement_handle);
   while (true) {
     int status = sqlite3_step(statement->stmt);
@@ -248,11 +252,13 @@ DART_FUNCTION(Step) {
 }
 
 DART_FUNCTION(CloseStatement) {
-  DART_ARGS(statement_handle);
+  DART_ARGS_1(statement_handle);
+
   statement_peer* statement = get_statement(statement_handle);
   CheckSqlError(statement->db, sqlite3_finalize(statement->stmt));
   Dart_DeletePersistentHandle(statement->finalizer);
   sqlite3_free(statement);
+  DART_RETURN(Dart_Null());
 }
 
 #define EXPORT(func, args) if (!strcmp(#func, cname) && argc == args) { return func; }

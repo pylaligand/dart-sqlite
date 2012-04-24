@@ -79,7 +79,7 @@ createBlogTable(db) {
 
 deleteWhenDone(callback(filename)) {
   var nonce = (Math.random() * 100000000).toInt();
-  var filename = "/tmp/dart-sqlite-test-${nonce}";
+  var filename = "dart-sqlite-test-${nonce}";
   try {
     callback(filename);
   } finally {
