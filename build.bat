@@ -1,5 +1,4 @@
 @ECHO OFF
-set DART_SOURCES=D:\dart-source\dart
 set DART_SDK=D:\dart-sdk\
 set SQLITE=.
 
@@ -7,7 +6,7 @@ IF "%1"=="doc" GOTO DOC
 IF "%1"=="test" GOTO TEST
 
 :BUILD
-cl /DDART_SHARED_LIB /D_USRDLL /D_WINDLL /I%SQLITE% /I%DART_SOURCES%\runtime\include src\dart_sqlite.cc %SQLITE%\sqlite3.c dart.lib /link /DLL /OUT:lib/dart_sqlite.dll
+cl /DDART_SHARED_LIB /D_USRDLL /D_WINDLL /I%SQLITE% /I%DART_SDK%\include src\dart_sqlite.cc %SQLITE%\sqlite3.c dart.lib /link /DLL /OUT:lib/dart_sqlite.dll
 GOTO END
 
 :DOC

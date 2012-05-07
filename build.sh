@@ -1,24 +1,20 @@
 #!/bin/bash
 
-#DART_SOURCES=$HOME/dart
 #DART_SDK=$HOME/dart-sdk
 
 if [ -z "$DART_SDK" ]; then
   DART_SDK="$HOME/dart-sdk"
 fi
-if [ -z "$DART_SOURCES" ]; then
-  DART_SOURCES="$HOME/dart"
-fi
 
 build() {
   SRCS="src/dart_sqlite.cc -lsqlite3"
-  COPTS="-O2 -DDART_SHARED_LIB -I$DART_SOURCES/runtime/include -rdynamic -fPIC -m32"
+  COPTS="-O2 -DDART_SHARED_LIB -I$DART_SDK/include -rdynamic -fPIC -m32"
   OUTNAME="dart_sqlite"
 
   UNAME=`uname`
   if [[ "$UNAME" == "Darwin" ]]; then
     COPTS="$COPTS -dynamiclib -undefined suppress -flat_namespace"
-    OUTNAME="$OUTNAME.dylib"
+    OUTNAME="lib$OUTNAME.dylib"
   else
     if [[ "$UNAME" != "Linux" ]]; then
       echo "Warning: Unrecognized OS $UNAME, this likely won't work"

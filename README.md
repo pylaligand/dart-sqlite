@@ -42,13 +42,11 @@ Yes! [Here's the dartdoc](http://sam-mccall.github.com/dart-sqlite/).
 # Building (Linux/Mac)
 
 You'll need:
-  * Dart source tree (strictly, you just need runtime/include/dart_api.h)
   * Dart SDK
   * sqlite3-dev package
   * g++ toolchain.
 
-Either edit build.sh to point to the source tree and SDK, or set the
-environment variables DART_SOURCES and DART_SDK.
+Either edit build.sh to point to the SDK, or set the environment variable DART_SDK.
 
 ## Building the library
 
@@ -66,13 +64,12 @@ environment variables DART_SOURCES and DART_SDK.
 
 You'll need:
 
-  * Dart source tree (strictly, you just need runtime/include/dart_api.h)
   * Dart SDK
   * dart.lib, the Dart native API library. You can obtain this by compiling Dart from source or grab [this version](https://github.com/downloads/sam-mccall/dart-sqlite/dart.lib) (last updated: 2012-04-24)
   * The [SQLite source code](http://www.sqlite.org/download.html) (the 'amalgamation')
   * Visual C++ 2008. The [free version](http://msdn.microsoft.com/en-us/express/future/bb421473) works fine.
 
-Edit build.cmd to point to the Dart source tree and SDK and the SQLite sources.
+Edit build.bat to point to the SDK and the SQLite sources.
 
 ## Building the library 
 
