@@ -235,9 +235,6 @@ class Row {
   }
 }
 
-_sqliteException(message) => new SqliteException._internal(message);
-_sqliteSyntaxException(message, sql) => new SqliteSyntaxException._internal(message, sql);
-
 _prepare(db, query, statementObject) native 'PrepareStatement';
 _reset(statement) native 'Reset';
 _bind(statement, params) native 'Bind';

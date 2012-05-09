@@ -40,7 +40,8 @@ DART_EXPORT Dart_Handle dart_sqlite_Init(Dart_Handle parent_library) {
 
 void Throw(const char* message) {
   Dart_Handle messageHandle = Dart_NewString(message);
-  Dart_ThrowException(Dart_Invoke(library, Dart_NewString("_sqliteException"), 1, &messageHandle));
+  Dart_Handle exceptionClass = Dart_GetClass(library, Dart_NewString("SqliteException"));
+  Dart_ThrowException(Dart_New(exceptionClass, Dart_NewString("_internal"), 1, &messageHandle));
 }
 
 void CheckSqlError(sqlite3* db, int result) {
@@ -119,7 +120,8 @@ DART_FUNCTION(PrepareStatement) {
     Dart_Handle params[2];
     params[0] = Dart_NewString(sqlite3_errmsg(db));
     params[1] = sql_handle;
-    Dart_ThrowException(Dart_Invoke(library, Dart_NewString("_sqliteSyntaxException"), 2, params));
+    Dart_Handle syntaxExceptionClass = CheckDartError(Dart_GetClass(library, Dart_NewString("SqliteSyntaxException")));
+    Dart_ThrowException(Dart_New(syntaxExceptionClass, Dart_NewString("_internal"), 2, params));
   }
   statement_peer* peer = (statement_peer*) sqlite3_malloc(sizeof(statement_peer));
   peer->db = db;

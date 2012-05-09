@@ -65,8 +65,16 @@ testTransactionFailure(db) {
   Expect.equals(0, db.execute("SELECT * FROM posts"));
 }
 
+testSyntaxError(db) {
+  Expect.throws(() => db.execute("random non sql"), (x) => x is sqlite.SqliteSyntaxException);
+}
+
+testColumnError(db) {
+  Expect.throws(() => db.first("select 2+2")['qwerty'], (x) => x is sqlite.SqliteException);
+}
+
 main() {
-  [testFirst, testRow, testBulk].forEach((test) {
+  [testFirst, testRow, testBulk, testSyntaxError, testColumnError].forEach((test) {
     connectionOnDisk(test);
     connectionInMemory(test);
   });
