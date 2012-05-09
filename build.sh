@@ -31,7 +31,7 @@ doc() {
   rm -r docs/{dart_core,dart_coreimpl,dart-ext_dart_sqlite}{,.html} 2>/dev/null
   cp docs/sqlite.html docs/index.html
   # Hack: The library headers are all on one line, and sqlite is the last.
-  find docs/ -name "*.html" | xargs sed -i 's/<h2>.*<h2>/<h2>/'
+  find docs/ -name "*.html" | xargs sed -i "" 's/<h2>.*<h2>/<h2>/'
 }
 
 test() {
