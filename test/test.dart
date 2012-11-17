@@ -1,5 +1,6 @@
-#import('dart:io', prefix: 'io');
-#import('../lib/sqlite.dart', prefix: 'sqlite');
+import 'dart:io' as io;
+import 'dart:math' as Math;
+import '../lib/sqlite.dart' as sqlite;
 
 testFirst(db) {
   var row = db.first("SELECT ?+2, UPPER(?)", [3, "hello"]);
@@ -41,7 +42,7 @@ testBulk(db) {
     return true;
   }));
   Expect.equals(1, rows.length);
-  Expect.equals("hi", rows[0].title);  
+  Expect.equals("hi", rows[0].title);
 }
 
 testTransactionSuccess(db) {
@@ -58,10 +59,11 @@ testTransactionFailure(db) {
   try {
     db.transaction(() {
       db.execute("INSERT INTO posts (title, body) VALUES (?,?)");
-      throw new UnsupportedOperationException("whee");
+      throw new UnsupportedError("whee");
     });
-    fail("Exception should have been propagated");
-  } catch (UnsupportedOperationException expected) {}
+    
+    Expect.fail("Exception should have been propagated");
+  } on UnsupportedError catch (expected) {}
   Expect.equals(0, db.execute("SELECT * FROM posts"));
 }
 
@@ -86,7 +88,8 @@ createBlogTable(db) {
 }
 
 deleteWhenDone(callback(filename)) {
-  var nonce = (Math.random() * 100000000).toInt();
+  var rnd = new Math.Random();
+  var nonce = (rnd.nextDouble() * 100000000).toInt();
   var filename = "dart-sqlite-test-${nonce}";
   try {
     callback(filename);

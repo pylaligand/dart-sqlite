@@ -2,11 +2,11 @@
 // Licensed under the Apache License, Version 2.0 (the "License")
 // You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
 
-#library("sqlite");
+library sqlite;
 
-#import("dart-ext:dart_sqlite");
+import "dart-ext:dart_sqlite";
 
-/// A connection to a SQLite database. 
+/// A connection to a SQLite database.
 ///
 /// Each database must be [close]d after use.
 class Database {
@@ -23,7 +23,7 @@ class Database {
   Database.inMemory() : this(":memory:");
 
   /// Returns the version number of the SQLite library.
-  static get version() => _version();
+  static get version => _version();
 
   String toString() => "<Sqlite: ${path}>";
 
@@ -118,7 +118,7 @@ class Statement {
   /// Closes this statement, and releases associated resources.
   ///
   /// This should be called exactly once for each instance created.
-  /// After calling this method, attempting to execute the statement will throw [SqliteException]. 
+  /// After calling this method, attempting to execute the statement will throw [SqliteException].
   void close() {
     _checkOpen();
     _closeStatement(_statement);
@@ -131,7 +131,7 @@ class Statement {
   /// If [callback] is given, it will be invoked for each [Row] that this statement produces.
   /// [callback] may return [:true:] to stop fetching rows.
   ///
-  /// Returns the number of rows fetched (for statements which produce rows), 
+  /// Returns the number of rows fetched (for statements which produce rows),
   /// or the number of rows affected (for statements which alter data).
   int execute([params = const [], bool callback(Row)]) {
     _checkOpen();
@@ -225,13 +225,14 @@ class Row {
 
   toString() => _data.toString();
 
-  noSuchMethod(String method, List args) {
-    if (args.length == 0 && method.startsWith("get:")) {
-      String property = method.substring(4);
+  noSuchMethod(InvocationMirror mirror) {
+    //mirror.invokeOn(receiver)
+    if (mirror.positionalArguments.length == 0 && mirror.memberName.startsWith("get:")) {
+      String property = mirror.memberName.substring(4);
       var index = _resultInfo.columnToIndex[property];
       if (index != null) return _data[index];
     }
-    return super.noSuchMethod(method, args);
+    return super.noSuchMethod(mirror);
   }
 }
 
