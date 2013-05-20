@@ -1,0 +1,3 @@
+name: dart-sqlite
+dependencies:
+  unittest: any
