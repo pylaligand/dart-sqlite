@@ -1,56 +1,58 @@
-#import('dart:io', prefix: 'io');
-#import('../lib/sqlite.dart', prefix: 'sqlite');
+import 'dart:io' as io;
+import 'dart:math';
+import '../lib/sqlite.dart' as sqlite;
+import 'package:unittest/unittest.dart';
 
 testFirst(db) {
   var row = db.first("SELECT ?+2, UPPER(?)", [3, "hello"]);
-  Expect.equals(5, row[0]);
-  Expect.equals("HELLO", row[1]);
+  expect(5, equals(row[0]));
+  expect("HELLO", equals(row[1]));
 }
 
 testRow(db) {
   var row = db.first("SELECT 42 AS foo");
-  Expect.equals(0, row.index);
+  expect(0, equals(row.index));
 
-  Expect.equals(42, row[0]);
-  Expect.equals(42, row['foo']);
-  Expect.equals(42, row.foo);
+  expect(42, equals(row[0]));
+  expect(42, equals(row['foo']));
+  expect(42, equals(row.foo));
 
-  Expect.listEquals([42], row.asList());
-  Expect.mapEquals({"foo": 42}, row.asMap());
+  expect([42], equals(row.asList()));
+  expect({"foo": 42}, equals(row.asMap()));
 }
 
 testBulk(db) {
   createBlogTable(db);
   var insert = db.prepare("INSERT INTO posts (title, body) VALUES (?,?)");
   try {
-    Expect.equals(1, insert.execute(["hi", "hello world"]));
-    Expect.equals(1, insert.execute(["bye", "goodbye cruel world"]));
+    expect(1, equals(insert.execute(["hi", "hello world"])));
+    expect(1, equals(insert.execute(["bye", "goodbye cruel world"])));
   } finally {
     insert.close();
   }
   var rows = [];
-  Expect.equals(2, db.execute("SELECT * FROM posts", callback: (row) { rows.add(row); }));
-  Expect.equals(2, rows.length);
-  Expect.equals("hi", rows[0].title);
-  Expect.equals("bye", rows[1].title);
-  Expect.equals(0, rows[0].index);
-  Expect.equals(1, rows[1].index);
+  expect(2, equals(db.execute("SELECT * FROM posts", [], (row) { rows.add(row); })));
+  expect(2, equals(rows.length));
+  expect("hi", equals(rows[0].title));
+  expect("bye", equals(rows[1].title));
+  expect(0, equals(rows[0].index));
+  expect(1, equals(rows[1].index));
   rows = [];
-  Expect.equals(1, db.execute("SELECT * FROM posts", callback: (row) {
+  expect(1, equals(db.execute("SELECT * FROM posts", [], (row) {
     rows.add(row);
     return true;
-  }));
-  Expect.equals(1, rows.length);
-  Expect.equals("hi", rows[0].title);  
+  })));
+  expect(1, equals(rows.length));
+  expect("hi", equals(rows[0].title));
 }
 
 testTransactionSuccess(db) {
   createBlogTable(db);
-  Expect.equals(42, db.transaction(() {
+  expect(42, equals(db.transaction(() {
     db.execute("INSERT INTO posts (title, body) VALUES (?,?)");
     return 42;
-  }));
-  Expect.equals(1, db.execute("SELECT * FROM posts"));
+        })));
+  expect(1, equals(db.execute("SELECT * FROM posts")));
 }
 
 testTransactionFailure(db) {
@@ -62,15 +64,17 @@ testTransactionFailure(db) {
     });
     fail("Exception should have been propagated");
   } catch (UnsupportedOperationException expected) {}
-  Expect.equals(0, db.execute("SELECT * FROM posts"));
+  expect.equals(0, db.execute("SELECT * FROM posts"));
 }
 
 testSyntaxError(db) {
-  Expect.throws(() => db.execute("random non sql"), (x) => x is sqlite.SqliteSyntaxException);
+  expect(() => db.execute("random non sql"),
+         throwsA(new isInstanceOf<sqlite.SqliteSyntaxException>()));
 }
 
 testColumnError(db) {
-  Expect.throws(() => db.first("select 2+2")['qwerty'], (x) => x is sqlite.SqliteException);
+  expect(() => db.first("select 2+2")['qwerty'],
+         throwsA(new isInstanceOf<sqlite.SqliteException>()));
 }
 
 main() {
@@ -86,7 +90,7 @@ createBlogTable(db) {
 }
 
 deleteWhenDone(callback(filename)) {
-  var nonce = (Math.random() * 100000000).toInt();
+  var nonce = new Random().nextInt(100000000);
   var filename = "dart-sqlite-test-${nonce}";
   try {
     callback(filename);
