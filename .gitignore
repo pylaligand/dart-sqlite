@@ -1,4 +1,9 @@
+*.o
 *.so
 *.dylib
 *.dll
+.packages
+.pub/
 docs/
+packages
+pubspec.lock

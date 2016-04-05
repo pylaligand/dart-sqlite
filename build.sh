@@ -1,29 +1,47 @@
 #!/bin/bash
 
-#DART_SDK=$HOME/dart-sdk
-
 if [ -z "$DART_SDK" ]; then
-  DART_SDK="$HOME/dart-sdk"
+  echo "Missing DART_SDK environment variable."
+  exit 1
 fi
 
 build() {
-  SRCS="src/dart_sqlite.cc -lsqlite3"
-  COPTS="-O2 -DDART_SHARED_LIB -I$DART_SDK/include -rdynamic -fPIC -m32"
-  OUTNAME="dart_sqlite"
+  $DART_SDK/bin/pub get
 
-  UNAME=`uname`
-  if [[ "$UNAME" == "Darwin" ]]; then
-    COPTS="$COPTS -dynamiclib -undefined suppress -flat_namespace"
-    OUTNAME="lib$OUTNAME.dylib"
-  else
-    if [[ "$UNAME" != "Linux" ]]; then
-      echo "Warning: Unrecognized OS $UNAME, this likely won't work"
-    fi
-    COPTS="$COPTS -shared"
-    OUTNAME="lib$OUTNAME.so"
-  fi
-  echo g++ $COPTS $SRCS -o lib/$OUTNAME
-  g++ $COPTS $SRCS -o lib/$OUTNAME
+  PLATFORM="$(uname -s)"
+  DART_VERSION=$(dart --version 2>&1)
+  case "$DART_VERSION" in
+    (*32*)
+      MACOS_ARCH="i386"
+      LINUX_ARCH="32"
+      ;;
+    (*64*)
+      MACOS_ARCH="x86_64"
+      LINUX_ARCH="64"
+      ;;
+    (*)
+      echo Unsupported dart architecture $DART_VERSION.  Exiting ... >&2
+      exit 3
+      ;;
+  esac
+
+  echo "Building extension for platform $PLATFORM/$MACOS_ARCH"
+  case "$PLATFORM" in
+    (Darwin)
+      g++ -fPIC -I $DART_SDK/include -c src/dart_sqlite.cc -arch $MACOS_ARCH
+      gcc -shared -lsqlite3 -Wl,-install_name,libdart_sqlite.dylib,-undefined,dynamic_lookup,-arch,$MACOS_ARCH -o \
+        lib/libdart_sqlite.dylib dart_sqlite.o
+      ;;
+    (Linux)
+      g++ -fPIC -I $DART_SDK/include -c src/dart_sqlite.cc -m$LINUX_ARCH
+      gcc -shared -lsqlite3 -Wl,-soname,libdart_sqlite.so -o \
+        lib/libdart_sqlite.so dart_sqlite.o
+      ;;
+    (*)
+      echo Unsupported platform $PLATFORM.  Exiting ... >&2
+      exit 3
+      ;;
+  esac
 }
 
 doc() {
@@ -36,7 +54,7 @@ doc() {
 
 test() {
   build && \
-  $DART_SDK/bin/dart test/test.dart
+  $DART_SDK/bin/pub run test
 }
 
 if [ -z "$1" ]; then
