@@ -1,0 +1,10 @@
+language: dart
+dart:
+  - stable
+branches:
+  only:
+    - master
+script:
+  - ./build.sh
+  - dartanalyzer --lints --fatal-warnings --fatal-hints lib/*.dart test/*.dart
+  - pub run test
