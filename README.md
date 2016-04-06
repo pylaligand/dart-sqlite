@@ -1,5 +1,7 @@
-dart-sqlite: SQLite bindings for the Dart VM
+SQLite bindings for the Dart VM
 ============================================
+
+[![Build status](https://travis-ci.org/pylaligand/dart-sqlite.svg?branch=master)](https://travis-ci.org/pylaligand/dart-sqlite)
 
 # Download
 
@@ -71,7 +73,7 @@ You'll need:
 
 Edit build.bat to point to the SDK and the SQLite sources.
 
-## Building the library 
+## Building the library
 
 Edit build.bat to specify where you extracted the SQLite and Dart sources.
 
