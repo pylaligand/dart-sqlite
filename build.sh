@@ -29,13 +29,20 @@ build() {
   case "$PLATFORM" in
     (Darwin)
       g++ -fPIC -I $DART_SDK/include -c src/dart_sqlite.cc -arch $MACOS_ARCH
-      gcc -shared -lsqlite3 -Wl,-install_name,libdart_sqlite.dylib,-undefined,dynamic_lookup,-arch,$MACOS_ARCH -o \
-        lib/libdart_sqlite.dylib dart_sqlite.o
+      gcc -shared \
+        -Wl,-install_name,libdart_sqlite.dylib,-undefined,dynamic_lookup \
+        -arch,$MACOS_ARCH \
+        -o lib/libdart_sqlite.dylib \
+        dart_sqlite.o \
+        -lsqlite3
       ;;
     (Linux)
       g++ -fPIC -I $DART_SDK/include -c src/dart_sqlite.cc -m$LINUX_ARCH
-      gcc -shared -lsqlite3 -Wl,-soname,libdart_sqlite.so -o \
-        lib/libdart_sqlite.so dart_sqlite.o
+      gcc -shared \
+        -Wl,-soname,libdart_sqlite.so \
+        -o lib/libdart_sqlite.so \
+        dart_sqlite.o \
+        -lsqlite3
       ;;
     (*)
       echo Unsupported platform $PLATFORM.  Exiting ... >&2

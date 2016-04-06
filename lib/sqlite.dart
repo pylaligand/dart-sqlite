@@ -2,8 +2,6 @@
 // Licensed under the Apache License, Version 2.0 (the "License")
 // You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
 
-import "dart:mirrors";
-
 import "dart-ext:dart_sqlite";
 
 /// Receives the results of a statement's execution.
@@ -247,18 +245,6 @@ class Row {
   }
 
   toString() => _data.toString();
-
-  @override
-  noSuchMethod(Invocation invocation) {
-    if (invocation.isGetter) {
-      final property = MirrorSystem.getName(invocation.memberName);
-      final index = _resultInfo.columnToIndex[property];
-      if (index != null) {
-        return _data[index];
-      }
-    }
-    return super.noSuchMethod(invocation);
-  }
 }
 
 _prepare(db, query, statementObject) native 'PrepareStatement';

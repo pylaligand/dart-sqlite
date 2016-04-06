@@ -41,18 +41,17 @@ testRunner(DatabaseTest dbTest) {
 
 void main() {
   test('first', testRunner((db) {
-    var row = db.first("SELECT ?+2, UPPER(?)", params: [3, "hello"]);
+    final row = db.first("SELECT ?+2, UPPER(?)", params: [3, "hello"]);
     expect(row[0], equals(5));
     expect(row[1], equals("HELLO"));
   }));
 
   test('row', testRunner((db) {
-    var row = db.first("SELECT 42 AS foo");
+    final row = db.first("SELECT 42 AS foo");
     expect(row.index, equals(0));
 
     expect(row[0], equals(42));
     expect(row['foo'], equals(42));
-    expect(row.foo, equals(42));
 
     expect(row.asList(), equals(const [42]));
     expect(row.asMap(), equals(const {"foo": 42}));
@@ -67,18 +66,18 @@ void main() {
     } finally {
       insert.close();
     }
-    var rows = [];
+    final rows = <sqlite.Row>[];
     expect(
         db.execute("SELECT * FROM posts", callback: (row) {
           rows.add(row);
         }),
         equals(2));
     expect(rows.length, equals(2));
-    expect(rows[0].title, equals("hi"));
-    expect(rows[1].title, equals("bye"));
+    expect(rows[0]['title'], equals("hi"));
+    expect(rows[1]['title'], equals("bye"));
     expect(rows[0].index, equals(0));
     expect(rows[1].index, equals(1));
-    rows = [];
+    rows.clear();
     expect(
         db.execute("SELECT * FROM posts", callback: (row) {
           rows.add(row);
@@ -86,7 +85,7 @@ void main() {
         }),
         equals(1));
     expect(rows.length, equals(1));
-    expect(rows[0].title, equals("hi"));
+    expect(rows[0]['title'], equals("hi"));
   }));
 
   test('transaction success', testRunner((db) {
