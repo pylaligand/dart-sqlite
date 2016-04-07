@@ -6,7 +6,7 @@ SQLite bindings for the Dart VM
 # Download
 
 Try the [binary build](https://github.com/downloads/sam-mccall/dart-sqlite/v0.2.zip)
-which should work on Mac, 64-bit Linux, and Windows.
+which should work on Mac and 64-bit Linux.
 
 You can also build it yourself, see below.
 
@@ -61,32 +61,6 @@ Either edit build.sh to point to the SDK, or set the environment variable DART_S
 ## Running tests
 
     ./build.sh test
-
-# Building (Windows)
-
-You'll need:
-
-  * Dart SDK
-  * dart.lib, the Dart native API library. You can obtain this by compiling Dart from source or grab [this version](https://github.com/downloads/sam-mccall/dart-sqlite/dart.lib) (last updated: 2012-04-24)
-  * The [SQLite source code](http://www.sqlite.org/download.html) (the 'amalgamation')
-  * Visual C++ 2008. The [free version](http://msdn.microsoft.com/en-us/express/future/bb421473) works fine.
-
-Edit build.bat to point to the SDK and the SQLite sources.
-
-## Building the library
-
-Edit build.bat to specify where you extracted the SQLite and Dart sources.
-
-    C:\Program Files (x86)\Microsoft Visual Studio 9.0\VC\vcvarsall.bat
-    build
-
-## Generating the documentation
-
-    build doc
-
-## Running tests
-
-    build test
 
 # Legal stuff
 Copyright 2012 Google Inc.
