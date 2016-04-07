@@ -206,7 +206,6 @@ class _ResultInfo {
 ///
 ///   * By index: `row[0]`
 ///   * By name: `row['title']`
-///   * By name: `row.title`
 ///
 /// Column names are not guaranteed unless a SQL AS clause is used.
 class Row {
