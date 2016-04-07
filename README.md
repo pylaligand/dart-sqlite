@@ -39,7 +39,7 @@ You can also build it yourself, see below.
 
 # Documentation
 
-Yes! [Here's the dartdoc](http://sam-mccall.github.com/dart-sqlite/).
+Yes! [Here's the dartdoc](http://pylaligand.github.com/dart-sqlite/).
 
 # Building (Linux/Mac)
 
