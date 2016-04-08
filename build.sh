@@ -1,6 +1,6 @@
 #!/bin/bash
 
-if [ -z "$DART_SDK" ]; then
+if [[ -z "$DART_SDK" ]]; then
   echo "Missing DART_SDK environment variable."
   exit 1
 fi
@@ -31,7 +31,6 @@ build() {
       g++ -fPIC -I $DART_SDK/include -c src/dart_sqlite.cc -arch $MACOS_ARCH
       gcc -shared \
         -Wl,-install_name,libdart_sqlite.dylib,-undefined,dynamic_lookup \
-        -arch,$MACOS_ARCH \
         -o lib/libdart_sqlite.dylib \
         dart_sqlite.o \
         -lsqlite3
@@ -60,8 +59,7 @@ doc() {
 }
 
 test() {
-  build && \
-  $DART_SDK/bin/pub run test
+  build && $DART_SDK/bin/pub run test
 }
 
 if [ -z "$1" ]; then
