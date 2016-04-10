@@ -5,7 +5,7 @@
 import "dart-ext:dart_sqlite";
 
 /// Receives the results of a statement's execution.
-typedef bool StatementCallback(Row);
+typedef bool StatementCallback(Row row);
 
 /// A connection to a SQLite database.
 ///
@@ -25,9 +25,10 @@ class Database {
   Database.inMemory() : this(":memory:");
 
   /// Returns the version number of the SQLite library.
-  static get version => _version();
+  static String get version => _version();
 
-  String toString() => "<Sqlite: ${path}>";
+  @override
+  String toString() => "<sqlite: $path>";
 
   /// Closes the database.
   ///
@@ -40,11 +41,12 @@ class Database {
     _db = null;
   }
 
-  /// Executes [callback] in a transaction, and returns the callback's return value.
+  /// Executes [callback] in a transaction, and returns the callback's return
+  /// value.
   ///
   /// If the callbacks throws an exception, the transaction will be rolled back
   /// and the exception propagated, otherwise the transaction will be committed.
-  transaction(callback()) {
+  dynamic transaction(dynamic callback) {
     _checkOpen();
     execute("BEGIN");
     try {
@@ -83,10 +85,11 @@ class Database {
 
   /// Executes a single SQL statement, and returns the first row.
   ///
-  /// Any additional results will be discarded. If there are no results, returns null.
+  /// Any additional results will be discarded. If there are no results, returns
+  /// null.
   Row first(String statement, {List params: const []}) {
     _checkOpen();
-    var result = null;
+    var result;
     execute(statement, params: params, callback: (row) {
       result = row;
       return true;
@@ -101,8 +104,8 @@ class Database {
 
 /// A reusable prepared SQL statement.
 ///
-/// The statement may contain placeholders for values, these values are specified
-/// with each call to [execute].
+/// The statement may contain placeholders for values, these values are
+/// specified with each call to [execute].
 ///
 /// Each prepared statement should be closed after use.
 class Statement {
@@ -127,7 +130,8 @@ class Statement {
   /// Closes this statement, and releases associated resources.
   ///
   /// This should be called exactly once for each instance created.
-  /// After calling this method, attempting to execute the statement will throw [SqliteException].
+  /// After calling this method, attempting to execute the statement will throw
+  /// [SqliteException].
   void close() {
     _checkOpen();
     _closeStatement(_statement);
@@ -136,9 +140,10 @@ class Statement {
 
   /// Executes this statement.
   ///
-  /// If this statement contains placeholders, their values must be specified in [params].
-  /// If [callback] is given, it will be invoked for each [Row] that this statement produces.
-  /// [callback] may return [:true:] to stop fetching rows.
+  /// If this statement contains placeholders, their values must be specified in
+  /// [params].
+  /// If [callback] is given, it will be invoked for each [Row] that this
+  /// statement produces. [callback] may return [:true:] to stop fetching rows.
   ///
   /// Returns the number of rows fetched (for statements which produce rows),
   /// or the number of rows affected (for statements which alter data).
@@ -148,10 +153,10 @@ class Statement {
     if (params.length > 0) _bind(_statement, params);
     var result;
     int count = 0;
-    var info = null;
+    var info;
     while ((result = _step(_statement)) is! int) {
       count++;
-      if (info == null) info = new _ResultInfo(_column_info(_statement));
+      if (info == null) info = new _ResultInfo(_columnInfo(_statement));
       if (callback != null &&
           callback(new Row._internal(count - 1, info, result)) == true) {
         result = count;
@@ -176,17 +181,23 @@ class Statement {
 /// Exception indicating a SQLite-related problem.
 class SqliteException implements Exception {
   final String message;
-  SqliteException._internal(String this.message);
-  toString() => "SqliteException: $message";
+
+  SqliteException._internal(this.message);
+
+  @override
+  String toString() => "SqliteException: $message";
 }
 
 /// Exception indicating that a SQL statement failed to compile.
 class SqliteSyntaxException extends SqliteException {
   /// The SQL that was rejected by the SQLite library.
   final String query;
-  SqliteSyntaxException._internal(String message, String this.query)
+
+  SqliteSyntaxException._internal(String message, this.query)
       : super._internal(message);
-  toString() => "SqliteSyntaxException: $message. Query: [${query}]";
+
+  @override
+  String toString() => "SqliteSyntaxException: $message. Query: [$query]";
 }
 
 class _ResultInfo {
@@ -219,7 +230,7 @@ class Row {
 
   /// Returns the value from the specified column.
   /// [i] may be a column name or index.
-  operator [](i) {
+  dynamic operator [](dynamic i) {
     if (i is int) {
       return _data[i];
     } else {
@@ -243,13 +254,14 @@ class Row {
     return result;
   }
 
-  toString() => _data.toString();
+  @override
+  String toString() => _data.toString();
 }
 
 _prepare(db, query, statementObject) native 'PrepareStatement';
 _reset(statement) native 'Reset';
 _bind(statement, params) native 'Bind';
-_column_info(statement) native 'ColumnInfo';
+_columnInfo(statement) native 'ColumnInfo';
 _step(statement) native 'Step';
 _closeStatement(statement) native 'CloseStatement';
 _new(path) native 'New';
