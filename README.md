@@ -3,12 +3,18 @@ SQLite bindings for the Dart VM
 
 [![Build status](https://travis-ci.org/pylaligand/dart-sqlite.svg?branch=master)](https://travis-ci.org/pylaligand/dart-sqlite)
 
-# Download
+# Installation
 
-Try the [binary build](https://github.com/downloads/sam-mccall/dart-sqlite/v0.2.zip)
-which should work on Mac and 64-bit Linux.
+Add the library to your specs:
+```
+dependencies:
+  sqlite: ^0.3.0
+```
 
-You can also build it yourself, see below.
+Add an extra step after `pub get` to download the native libraries:
+```
+pub get && pub run sqlite:install --package-root .
+```
 
 # Example
     #import('lib/sqlite.dart');
