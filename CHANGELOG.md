@@ -2,6 +2,7 @@
 
 - Updated to run on Dart 1.15.0
 - Removed Windows support
+- Package publication support
 
 ## 0.2
 
