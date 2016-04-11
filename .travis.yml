@@ -7,6 +7,7 @@ dart:
 branches:
   only:
     - master
+    - /^v\d.*$/
 script:
   - ./travis.sh
 deploy:
