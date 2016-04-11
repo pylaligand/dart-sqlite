@@ -1,4 +1,4 @@
-## Next
+## 0.3
 
 - Updated to run on Dart 1.15.0
 - Removed Windows support
