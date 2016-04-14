@@ -119,4 +119,17 @@ void main() {
     expect(() => db.first("select 2+2")['qwerty'],
         new Throws(new isInstanceOf<sqlite.SqliteException>()));
   }));
+
+  test('dynamic getters', _testRunner((db) {
+    _createBlogTable(db);
+    final inserted =
+        db.execute("INSERT INTO posts (title, body) VALUES ('hello', 'world')");
+    expect(inserted, equals(1));
+    final fetched =
+        db.execute("SELECT * FROM posts", callback: (sqlite.Row row) {
+      expect(row.title, equals("hello"));
+      expect(row.body, equals("world"));
+    });
+    expect(fetched, equals(1));
+  }));
 }
