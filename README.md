@@ -16,37 +16,6 @@ Add an extra step after `pub get` to download the native libraries:
 pub get && pub run sqlite:install --package-root .
 ```
 
-# Example
-    #import('lib/sqlite.dart');
-    var c = new sqlite.Database("/tmp/test.db");
-    try {
-        // Simple queries and statements
-        Row results = c.first("SELECT ?+2, UPPER(?)", [3, "Hello"]);
-        var five = results[0];
-        var shouting = results[1];
-
-        // Iterating over a result set
-        var count = c.execute("SELECT * FROM posts LIMIT 10", callback: (row) {
-            print("${row.title}: ${row.body}");
-        });
-        print("Showing ${count} posts.");
-
-        // Reusing prepared statements
-        var statement = c.prepare("INSERT INTO posts (title, body) VALUES (?,?)");
-        try {
-            statement.execute(["Hi", "Hello world"]);
-            statement.execute(["Byte", "Goodbye cruel world"]);
-        } finally {
-            statement.close();
-        }
-    } finally {
-        c.close();
-    }
-
-# Documentation
-
-Yes! [Here's the dartdoc](http://pylaligand.github.com/dart-sqlite/).
-
 # Building (Linux/Mac)
 
 You'll need:
@@ -68,7 +37,14 @@ Either edit build.sh to point to the SDK, or set the environment variable DART_S
 
     ./build.sh test
 
+# Documentation
+
+See [the examples](example/) for how to use the library and the
+[pub.dartlang.org](https://pub.dartlang.org/packages/sqlite) page for the API
+documentation.
+
 # Legal stuff
+
 Copyright 2012 Google Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
