@@ -2,6 +2,8 @@
 // Licensed under the Apache License, Version 2.0 (the "License")
 // You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
 
+import "dart:mirrors";
+
 import "dart-ext:dart_sqlite";
 
 /// Receives the results of a statement's execution.
@@ -214,11 +216,12 @@ class _ResultInfo {
 /// A row of data returned from a executing a [Statement].
 ///
 /// Entries can be accessed in several ways:
-///
 ///   * By index: `row[0]`
 ///   * By name: `row['title']`
+///   * By name: `row.title`
 ///
 /// Column names are not guaranteed unless a SQL AS clause is used.
+@proxy
 class Row {
   final _ResultInfo _resultInfo;
   final List _data;
@@ -256,6 +259,18 @@ class Row {
 
   @override
   String toString() => _data.toString();
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) {
+    if (invocation.isGetter) {
+      final property = MirrorSystem.getName(invocation.memberName);
+      final index = _resultInfo.columnToIndex[property];
+      if (index != null) {
+        return _data[index];
+      }
+    }
+    return super.noSuchMethod(invocation);
+  }
 }
 
 _prepare(db, query, statementObject) native 'PrepareStatement';
