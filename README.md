@@ -3,7 +3,8 @@ SQLite bindings for the Dart VM
 
 [![Build status](https://travis-ci.org/pylaligand/dart-sqlite.svg?branch=master)](https://travis-ci.org/pylaligand/dart-sqlite)
 
-# Installation
+
+## Installation
 
 Add the library to your specs:
 ```
@@ -16,34 +17,15 @@ Add an extra step after `pub get` to download the native libraries:
 pub get && pub run sqlite:install --package-root .
 ```
 
-# Building (Linux/Mac)
 
-You'll need:
-  * Dart SDK
-  * sqlite3-dev package
-  * g++ toolchain.
-
-Either edit build.sh to point to the SDK, or set the environment variable DART_SDK.
-
-## Building the library
-
-    ./build.sh
-
-## Generating documentation
-
-    ./build.sh doc
-
-## Running tests
-
-    ./build.sh test
-
-# Documentation
+## Documentation
 
 See [the examples](example/) for how to use the library and the
 [pub.dartlang.org](https://pub.dartlang.org/packages/sqlite) page for the API
 documentation.
 
-# Legal stuff
+
+## Legal stuff
 
 Copyright 2012 Google Inc.
 
