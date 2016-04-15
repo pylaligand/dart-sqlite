@@ -2,10 +2,11 @@
 
 set -e
 
-./build.sh
-$DART_SDK/bin/dartanalyzer --lints --fatal-warnings --fatal-hints lib/*.dart test/*.dart
+make build
+make analyze
 if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
   echo "Bypassing tests on Mac OS..."
 else
-  $DART_SDK/bin/pub run test
+  make example
+  make test
 fi

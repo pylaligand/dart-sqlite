@@ -4,6 +4,7 @@
 *.dll
 .packages
 .pub/
-docs/
+doc/
+out/
 packages
 pubspec.lock
