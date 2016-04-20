@@ -20,6 +20,5 @@ deploy:
     file: $DEPLOY_FILE
     skip_cleanup: true
     on:
-      condition: $TRAVIS_OS_NAME = linux
       tags: true
       repo: pylaligand/dart-sqlite
