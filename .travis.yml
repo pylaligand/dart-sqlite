@@ -1,9 +1,12 @@
 language: dart
-os:
-  - linux
-  - osx
-dart:
-  - stable
+matrix:
+  include:
+    - os: linux
+      dart: stable
+      env: DEPLOY_FILE=lib/libdart_sqlite.so
+    - os: osx
+      dart: stable
+      env: DEPLOY_FILE=lib/libdart_sqlite.dylib
 branches:
   only:
     - master
@@ -14,18 +17,9 @@ deploy:
   - provider: releases
     api_key:
       secure: ZqbRiUtwqQ1hDr/CLq8eHIkeMu6PIDqWvYEaBSHERkgdrKdzVNvBFtahXCPD99pp1jBQdAo0hxJIe1bCrn/fC9Y0eQ5R6iUSqwXEz9DAzxSnKfwvmTr/Wjb9zy8U2aN/QI5kL8IDf8sUuSLoa0jzv+1LkZNPqOercBrLZHrmE7UhesoFQUxFRruxJuJBKV9+eJnaKQAEad3XFAalWwUKktwzWnfnhMiRsepVODnsHaNZtnfR1DEDve7wzD7iKNejRRu86zqoDf0LHD0A94EyIgEYI0mX6g0zVmXOBbUuJsLcpBEZtJhU8mBdqA4DL1Oww8TAIpPvPtp0201OlKvBDIO2eYX6xpzvhJsPML9fWeecy2dRfkP+5gSiJpEH1BjYCjE4RJPEkm2pMnXlkYBaBGYrBRliIBT0XzV6h52YUJPE9Pp5I0v2/65qBYBlt0Gn2FmW6mXqJ8Y8/qDnaBs9s2THGTA7caJFoY3n7aoyFXC7c31QjEUg9gVe+PjJRUL7C8SNLsxW70meK/3bXA/jaHI/yKf59z6YrL8oJnnRA2nCjzwI6LaBYEZLxG4hxefB5UNq1VjsFjICfEwUaGq05xj20gWzX6cCKJm9bxa2XbtkYK9+Nm7PPKZK+mh4erSb3/7jzHo87lGThh11nJtanEDF6G94v77YyO4yHLLOECE=
-    file: lib/libdart_sqlite.so
+    file: $DEPLOY_FILE
     skip_cleanup: true
     on:
       condition: $TRAVIS_OS_NAME = linux
-      tags: true
-      repo: pylaligand/dart-sqlite
-  - provider: releases
-    api_key:
-      secure: ZqbRiUtwqQ1hDr/CLq8eHIkeMu6PIDqWvYEaBSHERkgdrKdzVNvBFtahXCPD99pp1jBQdAo0hxJIe1bCrn/fC9Y0eQ5R6iUSqwXEz9DAzxSnKfwvmTr/Wjb9zy8U2aN/QI5kL8IDf8sUuSLoa0jzv+1LkZNPqOercBrLZHrmE7UhesoFQUxFRruxJuJBKV9+eJnaKQAEad3XFAalWwUKktwzWnfnhMiRsepVODnsHaNZtnfR1DEDve7wzD7iKNejRRu86zqoDf0LHD0A94EyIgEYI0mX6g0zVmXOBbUuJsLcpBEZtJhU8mBdqA4DL1Oww8TAIpPvPtp0201OlKvBDIO2eYX6xpzvhJsPML9fWeecy2dRfkP+5gSiJpEH1BjYCjE4RJPEkm2pMnXlkYBaBGYrBRliIBT0XzV6h52YUJPE9Pp5I0v2/65qBYBlt0Gn2FmW6mXqJ8Y8/qDnaBs9s2THGTA7caJFoY3n7aoyFXC7c31QjEUg9gVe+PjJRUL7C8SNLsxW70meK/3bXA/jaHI/yKf59z6YrL8oJnnRA2nCjzwI6LaBYEZLxG4hxefB5UNq1VjsFjICfEwUaGq05xj20gWzX6cCKJm9bxa2XbtkYK9+Nm7PPKZK+mh4erSb3/7jzHo87lGThh11nJtanEDF6G94v77YyO4yHLLOECE=
-    file: lib/libdart_sqlite.dylib
-    skip_cleanup: true
-    on:
-      condition: $TRAVIS_OS_NAME = osx
       tags: true
       repo: pylaligand/dart-sqlite
