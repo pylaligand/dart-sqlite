@@ -32,6 +32,7 @@ DART_FILES := \
   bin/*.dart \
   example/*.dart \
   lib/*.dart \
+  lib/src/*.dart \
   test/*.dart
 
 .PHONY: *
@@ -46,7 +47,6 @@ build: check-dart-sdk
 	mkdir -p out
 	g++ -fPIC -I $(DART_SDK)/include -c src/dart_sqlite.cc $(G++_OPTIONS) -o out/dart_sqlite.o
 	gcc -shared $(GCC_OPTIONS) out/dart_sqlite.o -lsqlite3
-	@echo "$(DART_VERSION)"
 
 test: check-dart-sdk build
 	$(DART_SDK)/bin/pub run test
@@ -55,7 +55,7 @@ example: check-dart-sdk build
 	$(DART_SDK)/bin/dart example/statements.dart
 
 analyze: check-dart-sdk
-	$(DART_SDK)/bin/dartanalyzer --lints --fatal-warnings --fatal-hints $(DART_FILES)
+	$(DART_SDK)/bin/dartanalyzer --lints --fatal-warnings $(DART_FILES)
 
 docs:
 ifeq ($(shell which dartdoc),)
