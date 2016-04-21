@@ -39,5 +39,6 @@ We use the normal GitHub Pull Request process:
 
 1. fork the repository;
 2. make changes in your fork;
-3. send a Pull Request;
-4. profit.
+3. format your changed files with `make format`;
+4. send a Pull Request;
+5. profit.

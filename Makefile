@@ -28,6 +28,12 @@ else
   $(error Unsupported platform $(PLATFORM))
 endif
 
+DART_FILES := \
+  bin/*.dart \
+  example/*.dart \
+  lib/*.dart \
+  test/*.dart
+
 .PHONY: *
 all: build
 
@@ -49,13 +55,16 @@ example: check-dart-sdk build
 	$(DART_SDK)/bin/dart example/statements.dart
 
 analyze: check-dart-sdk
-	$(DART_SDK)/bin/dartanalyzer --lints --fatal-warnings --fatal-hints lib/*.dart test/*.dart example/*.dart
+	$(DART_SDK)/bin/dartanalyzer --lints --fatal-warnings --fatal-hints $(DART_FILES)
 
 docs:
 ifeq ($(shell which dartdoc),)
 	$(error Dartdoc needs to be installed first!)
 endif
 	dartdoc
+
+format: check-dart-sdk
+	$(DART_SDK)/bin/dartfmt -w $(DART_FILES)
 
 clean:
 	rm -rf out
@@ -68,3 +77,4 @@ help:
 	@echo " example		Run the examples"
 	@echo " analyze		Run the Dart analyzer"
 	@echo " docs			Generate the documentation"
+	@echo " format			Format all Dart files"
