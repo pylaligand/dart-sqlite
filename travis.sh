@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -e
+set -e -o pipefail
 
 make build
 make analyze
@@ -9,4 +9,10 @@ if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
 else
   make example
   make test
+fi
+
+output=`make format`
+if echo $output | grep "Formatted"; then
+  echo "Formatting issues!"
+  exit 314
 fi
