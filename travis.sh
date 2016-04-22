@@ -11,8 +11,10 @@ else
   make test
 fi
 
-output=`make format`
-if echo $output | grep "Formatted"; then
-  echo "Formatting issues!"
+output=`make dart_files | xargs dartfmt -n`
+if [[ -n "$output" ]]; then
+  echo "Some files are not properly formatted:"
+  echo $output
+  echo "Please run 'make format'"
   exit 314
 fi
