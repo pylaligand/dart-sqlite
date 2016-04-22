@@ -66,6 +66,9 @@ endif
 format: check-dart-sdk
 	$(DART_SDK)/bin/dartfmt -w $(DART_FILES)
 
+dart_files:
+	@echo $(DART_FILES)
+
 clean:
 	rm -rf out
 	find . -name *.so -o -name *.dylib | xargs rm
