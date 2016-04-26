@@ -120,7 +120,7 @@ void finalize_statement(void* isolate_callback_data, Dart_WeakPersistentHandle h
 }
 
 DART_FUNCTION(PrepareStatement) {
-  DART_ARGS_3(db_handle, sql_handle, statement_object);
+  DART_ARGS_2(db_handle, sql_handle);
 
   sqlite3* db = get_db(db_handle);
   const char* sql;
@@ -312,7 +312,7 @@ Dart_NativeFunction ResolveName(Dart_Handle name, int argc, bool* auto_setup_sco
   EXPORT(New, 1);
   EXPORT(Close, 1);
   EXPORT(Version, 0);
-  EXPORT(PrepareStatement, 3);
+  EXPORT(PrepareStatement, 2);
   EXPORT(Reset, 1);
   EXPORT(Bind, 2);
   EXPORT(Step, 1);
