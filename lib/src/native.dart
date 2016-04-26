@@ -2,7 +2,7 @@
 // Licensed under the Apache License, Version 2.0 (the "License")
 // You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
 
-import 'dart-ext:../dart_sqlite';
+import 'dart-ext:dart_sqlite';
 
 // Note: this import is required to allow the native code to instantiate and
 // throw exceptions.
