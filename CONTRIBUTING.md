@@ -42,3 +42,16 @@ We use the normal GitHub Pull Request process:
 3. format your changed files with `make format`;
 4. send a Pull Request;
 5. profit.
+
+
+## Creating a new release (team only)
+
+1. create [a PR](https://github.com/pylaligand/dart-sqlite/pull/50) bumping the
+   library version number to `X.Y.Z`;
+2. on GitHub, create a new release called `vX.Y.Z`;
+3. Travis will build the new tag: wait until the build shared libraries are
+   attached to the release;
+4. download the tag in your local client with `git fetch` and check it out with
+   `git checkout vX.Y.Z`
+5. try a publication dry run with `pub publish -n`
+6. go for it: `pub publish`
