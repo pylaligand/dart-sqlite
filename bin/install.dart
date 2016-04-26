@@ -55,7 +55,8 @@ Future main(List<String> args) async {
   final libUrl =
       release['assets'].firstWhere((asset) => asset['name'] == assetName)[
           'browser_download_url'];
-  final libFile = path.join(packageRoot, 'packages', 'sqlite', assetName);
+  final libFile =
+      path.join(packageRoot, 'packages', 'sqlite', 'src', assetName);
   await http.readBytes(libUrl).catchError((e, _) {
     print('Could not download library file: $e');
     exit(314);

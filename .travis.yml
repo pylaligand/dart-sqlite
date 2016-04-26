@@ -3,10 +3,10 @@ matrix:
   include:
     - os: linux
       dart: stable
-      env: DEPLOY_FILE=lib/libdart_sqlite.so
+      env: DEPLOY_FILE=lib/src/libdart_sqlite.so
     - os: osx
       dart: stable
-      env: DEPLOY_FILE=lib/libdart_sqlite.dylib
+      env: DEPLOY_FILE=lib/src/libdart_sqlite.dylib
 branches:
   only:
     - master
