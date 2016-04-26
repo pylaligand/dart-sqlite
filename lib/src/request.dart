@@ -4,10 +4,9 @@
 
 import 'dart:async';
 
-import '../row.dart';
-
 import 'exceptions.dart';
 import 'native.dart' as natives;
+import 'row.dart';
 import 'row_impl.dart';
 
 /// Interface to issue a single request to a SQLite database.
