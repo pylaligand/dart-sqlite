@@ -55,7 +55,7 @@ example: check-dart-sdk build
 	$(DART_SDK)/bin/dart example/statements.dart
 
 analyze: check-dart-sdk
-	$(DART_SDK)/bin/dartanalyzer --lints --fatal-warnings $(DART_FILES)
+	$(DART_SDK)/bin/dartanalyzer --fatal-lints --fatal-hints --fatal-warnings $(DART_FILES)
 
 docs:
 ifeq ($(shell which dartdoc),)
