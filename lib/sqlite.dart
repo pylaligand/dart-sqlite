@@ -7,10 +7,10 @@ import 'dart:async';
 import 'src/exceptions.dart';
 import 'src/native.dart' as natives;
 import 'src/request.dart';
-import 'row.dart';
+import 'src/row.dart';
 
 export 'src/exceptions.dart';
-export 'row.dart';
+export 'src/row.dart';
 
 /// A connection to a SQLite database.
 ///

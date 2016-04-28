@@ -4,9 +4,8 @@
 
 import 'dart:mirrors';
 
-import '../row.dart';
-
 import 'exceptions.dart';
+import 'row.dart';
 
 class RowMetadata {
   final List<String> columns;
