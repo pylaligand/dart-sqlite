@@ -2,14 +2,7 @@
 
 set -e -o pipefail
 
-make build
-make analyze
-if [[ "$TRAVIS_OS_NAME" == "osx" ]]; then
-  echo "Bypassing tests on Mac OS..."
-else
-  make example
-  make test
-fi
+make build analyze test example
 
 output=`make dart_files | xargs dartfmt -n`
 if [[ -n "$output" ]]; then
