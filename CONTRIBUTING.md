@@ -55,5 +55,6 @@ We use the normal GitHub Pull Request process:
    `git checkout vX.Y.Z`
 5. download the shared libraries with
 `dart tool/download_shared_libraries.dart`
-6. try a publication dry run with `pub publish -n`
-7. go for it: `pub publish`
+6. edit `.ignore` and comment out the lines for so and dylib files
+7. try a publication dry run with `pub publish -n`
+8. go for it: `pub publish`
