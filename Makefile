@@ -29,11 +29,11 @@ else
 endif
 
 DART_FILES := \
-  bin/*.dart \
   example/*.dart \
   lib/*.dart \
   lib/src/*.dart \
-  test/*.dart
+  test/*.dart \
+  tool/*.dart
 
 .PHONY: *
 all: build
