@@ -12,12 +12,16 @@ import 'package:path/path.dart' as path;
 import 'package:yaml/yaml.dart';
 
 const _FLAG_PACKAGE_ROOT = 'package-root';
+const _FLAG_GITHUB_USERNAME = 'username';
+const _FLAG_GITHUB_TOKEN = 'token';
 const _RELEASES_URL =
     'https://api.github.com/repos/pylaligand/dart-sqlite/releases';
 
 Future main(List<String> args) async {
   final parser = new ArgParser()
-    ..addOption(_FLAG_PACKAGE_ROOT, help: 'Root of the package [required]');
+    ..addOption(_FLAG_PACKAGE_ROOT, help: 'Root of the package [required]')
+    ..addOption(_FLAG_GITHUB_USERNAME, help: 'Github username')
+    ..addOption(_FLAG_GITHUB_TOKEN, help: 'Github personal access token');
   final params = parser.parse(args);
 
   if (!params.options.contains(_FLAG_PACKAGE_ROOT)) {
@@ -25,6 +29,8 @@ Future main(List<String> args) async {
     exit(314);
   }
   final packageRoot = params[_FLAG_PACKAGE_ROOT];
+  final username = params[_FLAG_GITHUB_USERNAME];
+  final token = params[_FLAG_GITHUB_TOKEN];
 
   if (!Platform.isLinux && !Platform.isMacOS) {
     print('This library is only supported on Linux and Mac OS!');
@@ -36,7 +42,13 @@ Future main(List<String> args) async {
   final version = deps['packages']['sqlite']['version'];
   print('Setting up version $version');
 
-  final releasesBody = await http.read(_RELEASES_URL).catchError((e, _) {
+  final authHeaders = {};
+  if (username != null && token != null) {
+    final authToken = BASE64.encode(UTF8.encode('$username:$token'));
+    authHeaders['Authorization'] = 'Basic $authToken';
+  }
+  final releasesBody =
+      await http.read(_RELEASES_URL, headers: authHeaders).catchError((e, _) {
     print('Unable to list releases: $e');
     exit(314);
   });
