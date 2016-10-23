@@ -17,6 +17,13 @@ Add an extra step after `pub get` to download the native libraries:
 pub get && pub run sqlite:install --package-root .
 ```
 
+If you intend to install the library on a regular basis (e.g. from a continuous
+build) you will need to authenticate with GitHub in order to avoid being
+rate-limited:
+```
+pub get && pub run sqlite:install --package-root . --username <username> --token <personal access token>
+```
+
 
 ## Documentation
 
