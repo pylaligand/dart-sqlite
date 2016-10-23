@@ -11,7 +11,6 @@ import 'package:http/http.dart' as http;
 import 'package:path/path.dart' as path;
 import 'package:yaml/yaml.dart';
 
-const _FLAG_PACKAGE_ROOT = 'package-root';
 const _FLAG_GITHUB_USERNAME = 'username';
 const _FLAG_GITHUB_TOKEN = 'token';
 const _RELEASES_URL =
@@ -19,27 +18,20 @@ const _RELEASES_URL =
 
 Future main(List<String> args) async {
   final parser = new ArgParser()
-    ..addOption(_FLAG_PACKAGE_ROOT, help: 'Root of the package [required]')
     ..addOption(_FLAG_GITHUB_USERNAME, help: 'Github username')
     ..addOption(_FLAG_GITHUB_TOKEN, help: 'Github personal access token');
   final params = parser.parse(args);
 
-  if (!params.options.contains(_FLAG_PACKAGE_ROOT)) {
+  if (!params.options.contains(_FLAG_GITHUB_USERNAME) ||
+      !params.options.contains(_FLAG_GITHUB_TOKEN)) {
     print(parser.usage);
     exit(314);
   }
-  final packageRoot = params[_FLAG_PACKAGE_ROOT];
   final username = params[_FLAG_GITHUB_USERNAME];
   final token = params[_FLAG_GITHUB_TOKEN];
 
-  if (!Platform.isLinux && !Platform.isMacOS) {
-    print('This library is only supported on Linux and Mac OS!');
-    exit(314);
-  }
-
-  final lockFile = path.join(packageRoot, 'pubspec.lock');
-  final deps = loadYaml(new File(lockFile).readAsStringSync());
-  final version = deps['packages']['sqlite']['version'];
+  final deps = loadYaml(new File('pubspec.yaml').readAsStringSync());
+  final version = deps['version'];
   print('Setting up version $version');
 
   final authHeaders = {};
@@ -62,16 +54,17 @@ Future main(List<String> args) async {
     exit(314);
   }
 
-  final assetName =
-      Platform.isLinux ? 'libdart_sqlite.so' : 'libdart_sqlite.dylib';
-  final libUrl =
-      release['assets'].firstWhere((asset) => asset['name'] == assetName)[
-          'browser_download_url'];
-  final libFile =
-      path.join(packageRoot, 'packages', 'sqlite', 'src', assetName);
-  await http.readBytes(libUrl).catchError((e, _) {
-    print('Could not download library file: $e');
-    exit(314);
-  }).then((bytes) => new File(libFile).writeAsBytesSync(bytes));
+  final assetNames = ['libdart_sqlite.so', 'libdart_sqlite.dylib'];
+  await Future.forEach(assetNames, (assetName) async {
+    final libUrl =
+        release['assets'].firstWhere((asset) => asset['name'] == assetName)[
+            'browser_download_url'];
+    final libFile = path.join('lib', assetName);
+    await http.readBytes(libUrl).catchError((e, _) {
+      print('Could not download library file: $e');
+      exit(314);
+    }).then((bytes) => new File(libFile).writeAsBytesSync(bytes));
+    print('Installed $assetName');
+  });
   print('Library setup complete');
 }
