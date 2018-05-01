@@ -11,7 +11,7 @@ class SqliteException implements Exception {
   SqliteException._internal(this.message);
 
   @override
-  String toString() => "SqliteException: $message";
+  String toString() => 'SqliteException: $message';
 }
 
 /// Exception indicating that a SQL statement failed to compile.
@@ -23,5 +23,5 @@ class SqliteSyntaxException extends SqliteException {
       : super._internal(message);
 
   @override
-  String toString() => "SqliteSyntaxException: $message. Query: [$query]";
+  String toString() => 'SqliteSyntaxException: $message. Query: [$query]';
 }

@@ -17,7 +17,7 @@ export 'src/row.dart';
 /// Each database must be [close]d after use.
 class Database {
   /// Handle to the native database, managed by the native layer.
-  var _db;
+  dynamic _db;
 
   /// The location on disk of the database file.
   final String path;
@@ -28,13 +28,13 @@ class Database {
   }
 
   /// Creates a new in-memory database, whose contents will not be persisted.
-  Database.inMemory() : this(":memory:");
+  Database.inMemory() : this(':memory:');
 
   /// Returns the version number of the SQLite library.
   static String get version => natives.version();
 
   @override
-  String toString() => "<sqlite: $path>";
+  String toString() => '<sqlite: $path>';
 
   /// Closes the database.
   ///
@@ -47,25 +47,25 @@ class Database {
     _db = null;
   }
 
-  /// Executes [callback] in a transaction.
+  /// Executes [operation] in a transaction.
   ///
   /// If the callbacks throws an exception, the transaction will be rolled back
   /// and the exception propagated, otherwise the transaction will be committed.
-  Future transaction(Future operation()) {
+  Future<dynamic> transaction(Future<void> operation()) {
     _ensureOpen();
     return execute('BEGIN')
-        .then((_) => operation())
-        .then((_) => execute('COMMIT'))
-        .catchError((error, stackTrace) {
-      return execute('ROLLBACK')
-          .then((_) => new Future.error(error, stackTrace));
+        .then<dynamic>((int _) => operation())
+        .then((dynamic _) => execute('COMMIT'))
+        .catchError((dynamic error, StackTrace stackTrace) {
+      return execute('ROLLBACK').then<Future<dynamic>>(
+          (int _) => new Future<dynamic>.error(error, stackTrace));
     });
   }
 
   /// Executes the SQL query and returns the number of affected rows.
   ///
   /// If [sql] has placeholders, use [params] to specify its values.
-  Future<int> execute(String sql, {List params: const []}) {
+  Future<int> execute(String sql, {List<dynamic> params: const <dynamic>[]}) {
     _ensureOpen();
     return new Request(_db, sql, params: params).execute();
   }
@@ -73,15 +73,15 @@ class Database {
   /// Issues a SQL query and streams the resulting rows.
   ///
   /// If [sql] has placeholders, use [params] to specify its values.
-  Stream<Row> query(String sql, {List params: const []}) {
+  Stream<Row> query(String sql, {List<dynamic> params: const <dynamic>[]}) {
     _ensureOpen();
     return new Request(_db, sql, params: params).query();
   }
 
   /// Checks that the database is open and throws an exception if it isn't.
-  _ensureOpen() {
+  void _ensureOpen() {
     if (_db == null) {
-      throw new SqliteException("Database is closed");
+      throw new SqliteException('Database is closed');
     }
   }
 }

@@ -14,7 +14,7 @@ class Request {
   /// Handle to the native statement object.
   ///
   /// Null if the request is inactive.
-  var _statement;
+  dynamic _statement;
 
   /// The SQL query.
   ///
@@ -23,7 +23,7 @@ class Request {
   final String sql;
 
   /// Values to bind to the statement.
-  List _params;
+  List<dynamic> _params;
 
   /// The number of rows affected by the request.
   ///
@@ -34,15 +34,14 @@ class Request {
   ///
   /// [db] must be the native handle to the database. Use [params] to specify
   /// values for placeholders in [sql].
-  Request(dynamic db, String sql, {List params: const []})
-      : this.sql = sql,
-        this._params = params,
+  Request(dynamic db, this.sql, {List<dynamic> params: const <dynamic>[]})
+      : this._params = params,
         _statement = natives.prepareStatement(db, sql);
 
   /// Throws an exception if the request is not active.
-  _ensureActive() {
+  void _ensureActive() {
     if (_statement == null) {
-      throw new SqliteException("Statement is closed");
+      throw new SqliteException('Statement is closed');
     }
   }
 
@@ -65,22 +64,20 @@ class Request {
     Timer timer;
 
     bool step() {
-      var rawResult = natives.evaluateStatement(_statement);
+      final dynamic rawResult = natives.evaluateStatement(_statement);
       if (rawResult is int) {
         _affectedRows = rawResult;
         controller.close();
         return false;
       }
-      final List result = rawResult;
-      if (rowMetadata == null) {
-        rowMetadata = new RowMetadata(natives.getColumnInfo(_statement));
-      }
+      final List<dynamic> result = rawResult;
+      rowMetadata ??= new RowMetadata(natives.getColumnInfo(_statement));
       controller.add(new RowImpl(index++, rowMetadata, result));
       return true;
     }
 
     void loop() {
-      timer = new Timer(Duration.ZERO, () {
+      timer = new Timer(Duration.zero, () {
         if (step()) {
           loop();
         }
@@ -107,7 +104,7 @@ class Request {
     if (_params.isNotEmpty) {
       natives.bindValues(_statement, _params);
     }
-    controller = new StreamController(
+    controller = new StreamController<Row>(
         onListen: start, onPause: stop, onResume: start, onCancel: finalize);
     return controller.stream;
   }
