@@ -87,13 +87,13 @@ void main() {
 
   test('syntax error', _testRunner((sqlite.Database db) async {
     expect(() => db.execute('random non sql'),
-        throwsA(const isInstanceOf<sqlite.SqliteSyntaxException>()));
+        throwsA(const TypeMatcher<sqlite.SqliteSyntaxException>()));
   }));
 
   test('column error', _testRunner((sqlite.Database db) async {
     final sqlite.Row row = await db.query('select 2+2').first;
     expect(() => row['qwerty'],
-        throwsA(const isInstanceOf<sqlite.SqliteException>()));
+        throwsA(const TypeMatcher<sqlite.SqliteException>()));
   }));
 
   test('dynamic getters', _testRunner((sqlite.Database db) async {
