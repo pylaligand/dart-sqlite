@@ -41,4 +41,4 @@ void bindValues(dynamic statement, List<dynamic> params) native 'Bind';
 dynamic evaluateStatement(dynamic statement) native 'Step';
 
 /// Returns the list of column names for the results of the given statement.
-List<String> getColumnInfo(dynamic statement) native 'ColumnInfo';
+List<dynamic> getColumnInfo(dynamic statement) native 'ColumnInfo';
