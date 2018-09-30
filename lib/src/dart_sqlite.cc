@@ -29,38 +29,25 @@ typedef struct {
     Dart_WeakPersistentHandle finalizer;
 } statement_peer;
 
-DART_EXPORT Dart_Handle
-dart_sqlite_Init(Dart_Handle
-parent_library) {
-if (
-Dart_IsError(parent_library)
-) {
-return
-parent_library;
-}
+DART_EXPORT Dart_Handle dart_sqlite_Init(Dart_Handle parent_library) {
+    if (Dart_IsError(parent_library)) { return parent_library; }
 
-Dart_Handle result_code = Dart_SetNativeResolver(parent_library, ResolveName, NULL);
-if (
-Dart_IsError(result_code)
-) return
-result_code;
+    Dart_Handle result_code = Dart_SetNativeResolver(parent_library, ResolveName, NULL);
+    if (Dart_IsError(result_code)) return result_code;
 
-library = Dart_NewPersistentHandle(parent_library);
+    library = Dart_NewPersistentHandle(parent_library);
 
-Dart_Handle class_name = Dart_NewStringFromCString("_RawPtrImpl");
-Dart_Handle ptr_class = Dart_CreateNativeWrapperClass(parent_library,
-                                                      class_name, 1);
-ptr_class_p = Dart_NewPersistentHandle(ptr_class);
+    Dart_Handle class_name = Dart_NewStringFromCString("_RawPtrImpl");
+    Dart_Handle ptr_class = Dart_CreateNativeWrapperClass(parent_library,
+                                                          class_name, 1);
+    ptr_class_p = Dart_NewPersistentHandle(ptr_class);
 
-return
-parent_library;
+    return parent_library;
 }
 
 void Throw(const char *message) {
-    Dart_Handle
-    messageHandle = Dart_NewStringFromCString(message);
-    Dart_Handle
-    exceptionClass = Dart_GetClass(library, Dart_NewStringFromCString("SqliteException"));
+    Dart_Handle messageHandle = Dart_NewStringFromCString(message);
+    Dart_Handle exceptionClass = Dart_GetClass(library, Dart_NewStringFromCString("SqliteException"));
     Dart_ThrowException(Dart_New(exceptionClass, Dart_NewStringFromCString("_internal"), 1, &messageHandle));
 }
 
@@ -68,33 +55,21 @@ void CheckSqlError(sqlite3 *db, int result) {
     if (result) Throw(sqlite3_errmsg(db));
 }
 
-Dart_Handle CheckDartError(Dart_Handle
-result) {
-if (
-Dart_IsError(result)
-)
-Throw(Dart_GetError(result)
-);
-return
-result;
+Dart_Handle CheckDartError(Dart_Handle result) {
+    if (Dart_IsError(result)) Throw(Dart_GetError(result));
+    return result;
 }
 
-sqlite3 *get_db(Dart_Handle
-db_handle) {
-intptr_t db_addr;
-Dart_GetNativeInstanceField(db_handle,
-0, &db_addr);
-return (sqlite3*)
-db_addr;
+sqlite3 *get_db(Dart_Handle db_handle) {
+    intptr_t db_addr;
+    Dart_GetNativeInstanceField(db_handle, 0, &db_addr);
+    return (sqlite3 *) db_addr;
 }
 
-statement_peer *get_statement(Dart_Handle
-statement_handle) {
-intptr_t statement_addr;
-Dart_GetNativeInstanceField(statement_handle,
-0, &statement_addr);
-return (statement_peer*)
-statement_addr;
+statement_peer *get_statement(Dart_Handle statement_handle) {
+    intptr_t statement_addr;
+    Dart_GetNativeInstanceField(statement_handle, 0, &statement_addr);
+    return (statement_peer *) statement_addr;
 }
 
 DART_FUNCTION(New) {
@@ -102,8 +77,7 @@ DART_FUNCTION(New) {
 
     sqlite3 *db;
     const char *cpath;
-    Dart_Handle
-    result;
+    Dart_Handle result;
 
     CheckDartError(Dart_StringToCString(path, &cpath));
     CheckSqlError(db, sqlite3_open(cpath, &db));
@@ -151,17 +125,14 @@ DART_FUNCTION(PrepareStatement) {
     sqlite3 *db = get_db(db_handle);
     const char *sql;
     sqlite3_stmt *stmt;
-    Dart_Handle
-    result;
+    Dart_Handle result;
 
     CheckDartError(Dart_StringToCString(sql_handle, &sql));
     if (sqlite3_prepare_v2(db, sql, strlen(sql), &stmt, NULL)) {
-        Dart_Handle
-        params[2];
+        Dart_Handle params[2];
         params[0] = Dart_NewStringFromCString(sqlite3_errmsg(db));
         params[1] = sql_handle;
-        Dart_Handle
-        syntaxExceptionClass = CheckDartError(
+        Dart_Handle syntaxExceptionClass = CheckDartError(
                 Dart_GetClass(library, Dart_NewStringFromCString("SqliteSyntaxException")));
         Dart_ThrowException(Dart_New(syntaxExceptionClass, Dart_NewStringFromCString("_internal"), 2, params));
     }
@@ -197,8 +168,7 @@ DART_FUNCTION(Bind) {
         Throw("Number of arguments doesn't match number of placeholders");
     }
     for (int i = 0; i < count; i++) {
-        Dart_Handle
-        value = Dart_ListGetAt(args, i);
+        Dart_Handle value = Dart_ListGetAt(args, i);
         if (Dart_IsInteger(value)) {
             int64_t result;
             Dart_IntegerToInt64(value, &result);
@@ -239,8 +209,7 @@ DART_FUNCTION(Bind) {
 Dart_Handle get_column_value(statement_peer *statement, int col) {
     int count;
     const unsigned char *binary_data;
-    Dart_Handle
-    result;
+    Dart_Handle result;
     switch (sqlite3_column_type(statement->stmt, col)) {
         case SQLITE_INTEGER:
             return Dart_NewInteger(sqlite3_column_int64(statement->stmt, col));
@@ -274,8 +243,7 @@ Dart_Handle get_column_value(statement_peer *statement, int col) {
 
 Dart_Handle get_last_row(statement_peer *statement) {
     int count = sqlite3_column_count(statement->stmt);
-    Dart_Handle
-    list = CheckDartError(Dart_NewList(count));
+    Dart_Handle list = CheckDartError(Dart_NewList(count));
     for (int i = 0; i < count; i++) {
         Dart_ListSetAt(list, i, get_column_value(statement, i));
     }
@@ -287,8 +255,7 @@ DART_FUNCTION(ColumnInfo) {
 
     statement_peer *statement = get_statement(statement_handle);
     int count = sqlite3_column_count(statement->stmt);
-    Dart_Handle
-    result = Dart_NewList(count);
+    Dart_Handle result = Dart_NewList(count);
     for (int i = 0; i < count; i++) {
         Dart_ListSetAt(result, i, Dart_NewStringFromCString(sqlite3_column_name(statement->stmt, i)));
     }
@@ -332,30 +299,22 @@ DART_FUNCTION(CloseStatement) {
 }
 
 #define EXPORT(func, args) if (!strcmp(#func, cname) && argc == args) { return func; }
-Dart_NativeFunction ResolveName(Dart_Handle
-name,
-int argc,
-bool *auto_setup_scope
-) {
-assert (Dart_IsString(name));
 
-const char *cname;
-Dart_Handle check_error = Dart_StringToCString(name, &cname);
-if (
-Dart_IsError(check_error)
-)
-Dart_PropagateError(check_error);
-*
-auto_setup_scope = false;
+Dart_NativeFunction ResolveName(Dart_Handle name, int argc, bool *auto_setup_scope) {
+    assert(Dart_IsString(name));
+    const char *cname;
+    Dart_Handle check_error = Dart_StringToCString(name, &cname);
+    if (Dart_IsError(check_error)) Dart_PropagateError(check_error);
+    *auto_setup_scope = false;
 
-EXPORT(New, 1);
-EXPORT(Close, 1);
-EXPORT(Version, 0);
-EXPORT(PrepareStatement, 2);
-EXPORT(Reset, 1);
-EXPORT(Bind, 2);
-EXPORT(Step, 1);
-EXPORT(ColumnInfo, 1);
-EXPORT(CloseStatement, 1);
-return NULL;
+    EXPORT(New, 1);
+    EXPORT(Close, 1);
+    EXPORT(Version, 0);
+    EXPORT(PrepareStatement, 2);
+    EXPORT(Reset, 1);
+    EXPORT(Bind, 2);
+    EXPORT(Step, 1);
+    EXPORT(ColumnInfo, 1);
+    EXPORT(CloseStatement, 1);
+    return NULL;
 }
