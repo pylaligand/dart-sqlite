@@ -98,7 +98,7 @@ DART_FUNCTION(Close) {
         count++;
     }
     if (count) fprintf(stderr, "Warning: sqlite.Database.close(): %d statements still open.\n", count);
-    CheckSqlError(db, sqlite3_close(db));
+    CheckSqlError(db, sqlite3_close_v2(db));
     DART_RETURN(Dart_Null());
 }
 
