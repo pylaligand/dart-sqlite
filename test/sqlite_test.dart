@@ -9,26 +9,26 @@ import 'package:path/path.dart' as path;
 import 'package:sqlite/sqlite.dart' as sqlite;
 import 'package:test/test.dart';
 
-_createBlogTable(db) async {
+Future<void> _createBlogTable(sqlite.Database db) async {
   await db.execute('CREATE TABLE posts (title text, body text)');
 }
 
-typedef Future _DatabaseTest(sqlite.Database db);
+typedef Future<void> _DatabaseTest(sqlite.Database db);
 
-_runWithConnectionOnDisk(_DatabaseTest dbTest) async {
-  final fileName = path.join(
+Future<void> _runWithConnectionOnDisk(_DatabaseTest dbTest) async {
+  final String fileName = path.join(
       Directory.systemTemp.createTempSync('dart-sqlite-test-').path,
       'db.sqlite');
-  final db = new sqlite.Database(fileName);
+  final sqlite.Database db = new sqlite.Database(fileName);
   return dbTest(db).whenComplete(() => db.close());
 }
 
-_runWithConnectionInMemory(_DatabaseTest dbTest) async {
-  final db = new sqlite.Database.inMemory();
+Future<void> _runWithConnectionInMemory(_DatabaseTest dbTest) async {
+  final sqlite.Database db = new sqlite.Database.inMemory();
   return dbTest(db).whenComplete(() => db.close());
 }
 
-_testRunner(_DatabaseTest dbTest) {
+Function _testRunner(_DatabaseTest dbTest) {
   return () async {
     await _runWithConnectionOnDisk(dbTest);
     await _runWithConnectionInMemory(dbTest);
@@ -36,33 +36,35 @@ _testRunner(_DatabaseTest dbTest) {
 }
 
 void main() {
-  test('query with bindings', _testRunner((db) async {
-    final row =
-        await db.query('SELECT ?+2, UPPER(?)', params: [3, 'hello']).first;
+  test('query with bindings', _testRunner((sqlite.Database db) async {
+    final sqlite.Row row = await db
+        .query('SELECT ?+2, UPPER(?)', params: <dynamic>[3, 'hello']).first;
     expect(row[0], equals(5));
     expect(row[1], equals('HELLO'));
   }));
 
-  test('query', _testRunner((db) async {
-    final row = await db.query('SELECT 42 AS foo').first;
+  test('query', _testRunner((sqlite.Database db) async {
+    final sqlite.Row row = await db.query('SELECT 42 AS foo').first;
     expect(row.index, equals(0));
     expect(row[0], equals(42));
     expect(row['foo'], equals(42));
-    expect(row.toList(), equals(const [42]));
-    expect(row.toMap(), equals(const {'foo': 42}));
+    expect(row.toList(), equals(const <int>[42]));
+    expect(row.toMap(), equals(const <String, int>{'foo': 42}));
   }));
 
-  test('query multiple', _testRunner((db) async {
+  test('query multiple', _testRunner((sqlite.Database db) async {
     await _createBlogTable(db);
-    Future insert(List bindings) async {
-      int inserted = await db.execute(
+    Future<void> insert(List<dynamic> bindings) async {
+      final int inserted = await db.execute(
           'INSERT INTO posts (title, body) VALUES (?,?)',
           params: bindings);
       expect(inserted, equals(1));
     }
-    await insert(['hi', 'hello world']);
-    await insert(['bye', 'goodbye cruel world']);
-    final rows = await db.query('SELECT * FROM posts').toList();
+
+    await insert(<String>['hi', 'hello world']);
+    await insert(<String>['bye', 'goodbye cruel world']);
+    final List<sqlite.Row> rows =
+        await db.query('SELECT * FROM posts').toList();
     expect(rows.length, equals(2));
     expect(rows[0]['title'], equals('hi'));
     expect(rows[1]['title'], equals('bye'));
@@ -70,38 +72,39 @@ void main() {
     expect(rows[1].index, equals(1));
   }));
 
-  test('transaction success', _testRunner((db) async {
+  test('transaction success', _testRunner((sqlite.Database db) async {
     await _createBlogTable(db);
     await db.transaction(
         () => db.execute('INSERT INTO posts (title, body) VALUES (?,?)'));
     expect(await db.query('SELECT * FROM posts').length, equals(1));
   }));
 
-  test('transaction failure', _testRunner((db) async {
+  test('transaction failure', _testRunner((sqlite.Database db) async {
     return db
         .transaction(() => throw 'oh noes!')
-        .catchError(expectAsync((_) {}));
+        .catchError(expectAsync1<void, dynamic>((dynamic _) {}));
   }));
 
-  test('syntax error', _testRunner((db) async {
+  test('syntax error', _testRunner((sqlite.Database db) async {
     expect(() => db.execute('random non sql'),
-        new Throws(new isInstanceOf<sqlite.SqliteSyntaxException>()));
+        throwsA(const TypeMatcher<sqlite.SqliteSyntaxException>()));
   }));
 
-  test('column error', _testRunner((db) async {
-    final row = await db.query('select 2+2').first;
+  test('column error', _testRunner((sqlite.Database db) async {
+    final sqlite.Row row = await db.query('select 2+2').first;
     expect(() => row['qwerty'],
-        new Throws(new isInstanceOf<sqlite.SqliteException>()));
+        throwsA(const TypeMatcher<sqlite.SqliteException>()));
   }));
 
-  test('dynamic getters', _testRunner((db) async {
+  test('dynamic getters', _testRunner((sqlite.Database db) async {
     await _createBlogTable(db);
-    final inserted = await db
+    final int inserted = await db
         .execute('INSERT INTO posts (title, body) VALUES ("hello", "world")');
     expect(inserted, equals(1));
-    final rows = await db.query('SELECT * FROM posts').toList();
+    final List<sqlite.Row> rows =
+        await db.query('SELECT * FROM posts').toList();
     expect(rows.length, equals(1));
-    expect(rows[0].title, equals('hello'));
-    expect(rows[0].body, equals('world'));
+    expect(rows[0]['title'], equals('hello'));
+    expect(rows[0]['body'], equals('world'));
   }));
 }

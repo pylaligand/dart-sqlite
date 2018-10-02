@@ -9,7 +9,7 @@ import 'row.dart';
 
 class RowMetadata {
   final List<String> columns;
-  final Map<String, int> columnToIndex = {};
+  final Map<String, int> columnToIndex = <String, int>{};
 
   RowMetadata(this.columns) {
     for (int i = 0; i < columns.length; i++) {
@@ -20,7 +20,7 @@ class RowMetadata {
 
 class RowImpl implements Row {
   final RowMetadata _metadata;
-  final List _data;
+  final List<dynamic> _data;
 
   @override
   final int index;
@@ -32,9 +32,9 @@ class RowImpl implements Row {
     if (i is int) {
       return _data[i];
     } else {
-      var index = _metadata.columnToIndex[i];
+      final int index = _metadata.columnToIndex[i];
       if (index == null) {
-        throw new SqliteException("No such column $i");
+        throw new SqliteException('No such column $i');
       }
       return _data[index];
     }
@@ -45,7 +45,7 @@ class RowImpl implements Row {
 
   @override
   Map<String, Object> toMap() {
-    var result = new Map<String, Object>();
+    final Map<String, Object> result = <String, Object>{};
     for (int i = 0; i < _data.length; i++) {
       result[_metadata.columns[i]] = _data[i];
     }
@@ -58,8 +58,8 @@ class RowImpl implements Row {
   @override
   dynamic noSuchMethod(Invocation invocation) {
     if (invocation.isGetter) {
-      final property = MirrorSystem.getName(invocation.memberName);
-      final index = _metadata.columnToIndex[property];
+      final String property = MirrorSystem.getName(invocation.memberName);
+      final int index = _metadata.columnToIndex[property];
       if (index != null) {
         return _data[index];
       }

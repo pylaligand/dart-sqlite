@@ -1,3 +1,7 @@
+## 0.5.0
+
+- Update to Dart 2.0
+
 ## 0.4.0
 
 - Dynamic getters

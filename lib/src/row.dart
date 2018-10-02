@@ -7,10 +7,8 @@
 /// Entries can be accessed in several ways:
 ///   * By index: `row[0]`
 ///   * By name: `row['title']`
-///   * By name: `row.title`
 ///
 /// Column names are not guaranteed unless a SQL AS clause is used.
-@proxy
 abstract class Row {
   /// This row's offset into the result set.
   int get index;

@@ -24,7 +24,7 @@ make test
 
 Run the examples:
 ```
-make examples
+make example
 ```
 
 View all the available commands:
