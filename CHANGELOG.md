@@ -1,3 +1,6 @@
+## 1.0.0
+- Support Dart 2
+
 ## 0.4.0
 
 - Dynamic getters
