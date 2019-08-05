@@ -37,9 +37,8 @@ DART_EXPORT Dart_Handle dart_sqlite_Init(Dart_Handle parent_library) {
 
   library = Dart_NewPersistentHandle(parent_library);
 
-  Dart_Handle class_name = Dart_NewStringFromCString("_RawPtrImpl");
-  Dart_Handle ptr_class = Dart_CreateNativeWrapperClass(parent_library,
-          class_name, 1);
+  Dart_Handle class_name = Dart_NewStringFromCString("_NativeFieldWrapperClass");
+  Dart_Handle ptr_class = Dart_GetType(parent_library, class_name, 0, NULL);
   ptr_class_p = Dart_NewPersistentHandle(ptr_class);
 
   return parent_library;
@@ -257,7 +256,7 @@ DART_FUNCTION(ColumnInfo) {
 
   statement_peer* statement = get_statement(statement_handle);
   int count = sqlite3_column_count(statement->stmt);
-  Dart_Handle result = Dart_NewList(count);
+  Dart_Handle result = Dart_NewListOf(Dart_CoreType_String, count);
   for (int i = 0; i < count; i++) {
     Dart_ListSetAt(result, i, Dart_NewStringFromCString(sqlite3_column_name(statement->stmt, i)));
   }

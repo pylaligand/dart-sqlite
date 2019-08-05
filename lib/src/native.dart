@@ -3,6 +3,7 @@
 // You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
 
 import 'dart-ext:dart_sqlite';
+import 'dart:nativewrappers';
 
 // Note: this import is required to allow the native code to instantiate and
 // throw exceptions.
@@ -42,3 +43,7 @@ dynamic evaluateStatement(dynamic statement) native 'Step';
 
 /// Returns the list of column names for the results of the given statement.
 List<String> getColumnInfo(dynamic statement) native 'ColumnInfo';
+
+/// Native wrapper for use in dart_sqlite.cc
+/// ignore: unused_element
+class _NativeFieldWrapperClass extends NativeFieldWrapperClass1 { }

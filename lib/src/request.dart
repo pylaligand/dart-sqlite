@@ -11,6 +11,15 @@ import 'row_impl.dart';
 
 /// Interface to issue a single request to a SQLite database.
 class Request {
+  /// Creates a new database request for the [sql] query.
+  ///
+  /// [db] must be the native handle to the database. Use [params] to specify
+  /// values for placeholders in [sql].
+  Request(dynamic db, String sql, {List params: const []})
+      : this.sql = sql,
+        this._params = params,
+        _statement = natives.prepareStatement(db, sql);
+
   /// Handle to the native statement object.
   ///
   /// Null if the request is inactive.
@@ -30,19 +39,10 @@ class Request {
   /// Will only be available after all results have been streamed.
   int _affectedRows;
 
-  /// Creates a new database request for the [sql] query.
-  ///
-  /// [db] must be the native handle to the database. Use [params] to specify
-  /// values for placeholders in [sql].
-  Request(dynamic db, String sql, {List params: const []})
-      : this.sql = sql,
-        this._params = params,
-        _statement = natives.prepareStatement(db, sql);
-
   /// Throws an exception if the request is not active.
   _ensureActive() {
     if (_statement == null) {
-      throw new SqliteException("Statement is closed");
+      throw SqliteException("Statement is closed");
     }
   }
 
@@ -73,14 +73,14 @@ class Request {
       }
       final List result = rawResult;
       if (rowMetadata == null) {
-        rowMetadata = new RowMetadata(natives.getColumnInfo(_statement));
+        rowMetadata = RowMetadata(natives.getColumnInfo(_statement));
       }
-      controller.add(new RowImpl(index++, rowMetadata, result));
+      controller.add(RowImpl(index++, rowMetadata, result));
       return true;
     }
 
     void loop() {
-      timer = new Timer(Duration.ZERO, () {
+      timer = Timer(Duration.zero, () {
         if (step()) {
           loop();
         }
@@ -107,7 +107,7 @@ class Request {
     if (_params.isNotEmpty) {
       natives.bindValues(_statement, _params);
     }
-    controller = new StreamController(
+    controller = StreamController(
         onListen: start, onPause: stop, onResume: start, onCancel: finalize);
     return controller.stream;
   }

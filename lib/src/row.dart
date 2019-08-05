@@ -10,7 +10,6 @@
 ///   * By name: `row.title`
 ///
 /// Column names are not guaranteed unless a SQL AS clause is used.
-@proxy
 abstract class Row {
   /// This row's offset into the result set.
   int get index;
@@ -21,10 +20,10 @@ abstract class Row {
   dynamic operator [](dynamic i);
 
   /// Returns the values in this row as a list.
-  List<Object> toList();
+  List toList();
 
   /// Returns the values in this row as a map keyed by column name.
   ///
   /// The map iterates in column order.
-  Map<String, Object> toMap();
+  Map<String, dynamic> toMap();
 }

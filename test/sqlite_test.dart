@@ -19,12 +19,12 @@ _runWithConnectionOnDisk(_DatabaseTest dbTest) async {
   final fileName = path.join(
       Directory.systemTemp.createTempSync('dart-sqlite-test-').path,
       'db.sqlite');
-  final db = new sqlite.Database(fileName);
+  final db = sqlite.Database(fileName);
   return dbTest(db).whenComplete(() => db.close());
 }
 
 _runWithConnectionInMemory(_DatabaseTest dbTest) async {
-  final db = new sqlite.Database.inMemory();
+  final db = sqlite.Database.inMemory();
   return dbTest(db).whenComplete(() => db.close());
 }
 
@@ -48,8 +48,8 @@ void main() {
     expect(row.index, equals(0));
     expect(row[0], equals(42));
     expect(row['foo'], equals(42));
-    expect(row.toList(), equals(const [42]));
-    expect(row.toMap(), equals(const {'foo': 42}));
+    expect(row.toList(), equals([42]));
+    expect(row.toMap(), equals({'foo': 42}));
   }));
 
   test('query multiple', _testRunner((db) async {
@@ -80,18 +80,18 @@ void main() {
   test('transaction failure', _testRunner((db) async {
     return db
         .transaction(() => throw 'oh noes!')
-        .catchError(expectAsync((_) {}));
+        .catchError(expectAsync1((_) {}));
   }));
 
   test('syntax error', _testRunner((db) async {
     expect(() => db.execute('random non sql'),
-        new Throws(new isInstanceOf<sqlite.SqliteSyntaxException>()));
+        throwsA(isA<sqlite.SqliteSyntaxException>()));
   }));
 
   test('column error', _testRunner((db) async {
     final row = await db.query('select 2+2').first;
     expect(() => row['qwerty'],
-        new Throws(new isInstanceOf<sqlite.SqliteException>()));
+        throwsA(isA<sqlite.SqliteException>()));
   }));
 
   test('dynamic getters', _testRunner((db) async {
@@ -99,7 +99,7 @@ void main() {
     final inserted = await db
         .execute('INSERT INTO posts (title, body) VALUES ("hello", "world")');
     expect(inserted, equals(1));
-    final rows = await db.query('SELECT * FROM posts').toList();
+    final dynamic rows = await db.query('SELECT * FROM posts').toList();
     expect(rows.length, equals(1));
     expect(rows[0].title, equals('hello'));
     expect(rows[0].body, equals('world'));

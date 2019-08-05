@@ -16,12 +16,6 @@ export 'src/row.dart';
 ///
 /// Each database must be [close]d after use.
 class Database {
-  /// Handle to the native database, managed by the native layer.
-  var _db;
-
-  /// The location on disk of the database file.
-  final String path;
-
   /// Opens the specified database file, creating it if it doesn't exist.
   Database(this.path) {
     _db = natives.newDatabase(path);
@@ -29,6 +23,12 @@ class Database {
 
   /// Creates a new in-memory database, whose contents will not be persisted.
   Database.inMemory() : this(":memory:");
+
+  /// Handle to the native database, managed by the native layer.
+  var _db;
+
+  /// The location on disk of the database file.
+  final String path;
 
   /// Returns the version number of the SQLite library.
   static String get version => natives.version();
@@ -51,15 +51,15 @@ class Database {
   ///
   /// If the callbacks throws an exception, the transaction will be rolled back
   /// and the exception propagated, otherwise the transaction will be committed.
-  Future transaction(Future operation()) {
+  Future<int> transaction(Future operation()) {
     _ensureOpen();
     return execute('BEGIN')
         .then((_) => operation())
         .then((_) => execute('COMMIT'))
         .catchError((error, stackTrace) {
-      return execute('ROLLBACK')
-          .then((_) => new Future.error(error, stackTrace));
-    });
+          return execute('ROLLBACK')
+          .then((_) => Future<int>.error(error, stackTrace));
+        });
   }
 
   /// Executes the SQL query and returns the number of affected rows.
@@ -67,7 +67,7 @@ class Database {
   /// If [sql] has placeholders, use [params] to specify its values.
   Future<int> execute(String sql, {List params: const []}) {
     _ensureOpen();
-    return new Request(_db, sql, params: params).execute();
+    return Request(_db, sql, params: params).execute();
   }
 
   /// Issues a SQL query and streams the resulting rows.
@@ -75,13 +75,13 @@ class Database {
   /// If [sql] has placeholders, use [params] to specify its values.
   Stream<Row> query(String sql, {List params: const []}) {
     _ensureOpen();
-    return new Request(_db, sql, params: params).query();
+    return Request(_db, sql, params: params).query();
   }
 
   /// Checks that the database is open and throws an exception if it isn't.
   _ensureOpen() {
     if (_db == null) {
-      throw new SqliteException("Database is closed");
+      throw SqliteException("Database is closed");
     }
   }
 }

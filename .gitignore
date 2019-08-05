@@ -4,6 +4,7 @@
 *.dll
 .packages
 .pub/
+.dart_tool
 doc/
 out/
 packages

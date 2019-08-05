@@ -51,7 +51,7 @@ build: check-dart-sdk
 test: check-dart-sdk build
 	$(DART_SDK)/bin/pub run test
 
-example: check-dart-sdk build
+examples: check-dart-sdk build
 	$(DART_SDK)/bin/dart example/statements.dart
 
 analyze: check-dart-sdk

@@ -4,11 +4,11 @@
 
 /// Exception indicating a SQLite-related problem.
 class SqliteException implements Exception {
-  final String message;
-
   SqliteException(String message) : this._internal(message);
 
   SqliteException._internal(this.message);
+
+  final String message;
 
   @override
   String toString() => "SqliteException: $message";
@@ -16,11 +16,11 @@ class SqliteException implements Exception {
 
 /// Exception indicating that a SQL statement failed to compile.
 class SqliteSyntaxException extends SqliteException {
-  /// The SQL that was rejected by the SQLite library.
-  final String query;
-
   SqliteSyntaxException._internal(String message, this.query)
       : super._internal(message);
+
+  /// The SQL that was rejected by the SQLite library.
+  final String query;
 
   @override
   String toString() => "SqliteSyntaxException: $message. Query: [$query]";
